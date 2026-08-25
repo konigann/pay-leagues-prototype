@@ -1,0 +1,1035 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Яндекс Пэй — Лиги</title>
+  <style>
+    :root {
+      --ink: rgba(0, 0, 0, .86);
+      --secondary: rgba(0, 0, 0, .50);
+      --line: rgba(0, 0, 0, .08);
+      --surface: #f3f5f7;
+      --page: #fff;
+      --radius-l: 24px;
+      --radius-m: 20px;
+    }
+
+    * { box-sizing: border-box; }
+    .icon-sprite { position:absolute; width:0; height:0; overflow:hidden; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      display: grid;
+      place-items: start center;
+      padding: 24px;
+      height: 100vh;
+      overflow: hidden;
+      background: #202124;
+      color: var(--ink);
+      font-family: "YS Text", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    button { color: inherit; font: inherit; }
+
+    .phone {
+      position: relative;
+      width: 390px;
+      height: 812px;
+      max-width: 100%;
+      overflow: hidden;
+      border-radius: 40px;
+      background: var(--page);
+      box-shadow: 0 24px 72px rgba(0, 0, 0, .38);
+    }
+
+    .statusbar {
+      position: absolute;
+      z-index: 20;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 5px 32px 0 47px;
+      background: #fff;
+      font-family: "SF Pro Display", -apple-system, sans-serif;
+      font-size: 17px;
+      font-weight: 600;
+    }
+    .system-icons { display: flex; align-items: center; gap: 7px; }
+    .system-icons img { display: block; object-fit: contain; }
+    .cellular { width: 19px; height: 13px; }
+    .wifi { width: 17px; height: 13px; }
+    .battery {
+      position: relative;
+      width: 25px;
+      height: 13px;
+      border: 1px solid rgba(0,0,0,.30);
+      border-radius: 4px;
+      padding: 2px;
+    }
+    .battery::before {
+      content: "";
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: 2px;
+      background: var(--ink);
+    }
+    .battery::after {
+      content: "";
+      position: absolute;
+      top: 4px;
+      right: -3px;
+      width: 2px;
+      height: 5px;
+      border-radius: 0 2px 2px 0;
+      background: rgba(0,0,0,.35);
+    }
+
+    .navbar {
+      position: absolute;
+      z-index: 19;
+      top: 44px;
+      left: 0;
+      width: 100%;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 24px;
+      background: #fff;
+    }
+    .pay-logo { display: flex; align-items: center; gap: 6px; height: 28px; }
+    .pay-logo img:first-child { width: 28px; height: 28px; }
+    .pay-logo img:last-child { width: 62px; height: 28px; }
+    .profile { display: flex; align-items: center; gap: 8px; }
+    .plus-counter {
+      height: 24px;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: 0 4px 0 7px;
+      border: 0;
+      border-radius: 72px;
+      background: linear-gradient(90deg, #ff5c4d, #eb469f 25%, #8341ef 72%, #3f68f9);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 24px;
+    }
+    .plus-counter img { width: 16px; height: 16px; }
+    .avatar { position: relative; width: 36px; height: 36px; }
+    .avatar .photo {
+      position: absolute;
+      inset: 3px;
+      width: 30px;
+      height: 30px;
+      border: 1px solid rgba(0,0,0,.10);
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .avatar .ring { position: absolute; inset: 0; width: 36px; height: 36px; }
+
+    .screen {
+      position: absolute;
+      top: 92px;
+      bottom: 65px;
+      left: 0;
+      width: 100%;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: none;
+      background: #fff;
+    }
+    .screen::-webkit-scrollbar { display: none; }
+    .view { display: none; min-height: 100%; }
+    .view.active { display: block; }
+
+    .product-stack { position: relative; height: 194px; padding: 12px 20px 0; }
+    .product-card {
+      position: absolute;
+      left: 20px;
+      width: 350px;
+      height: 220px;
+      border-radius: 24px;
+      padding: 20px;
+      overflow: hidden;
+    }
+    .split-card { top: 12px; background: #c1f79b; }
+    .split-card::after {
+      content: "";
+      position: absolute;
+      inset: -35px -25px;
+      background: radial-gradient(ellipse at 55% 20%, rgba(255,255,255,.44), transparent 48%);
+      pointer-events: none;
+    }
+    .pay-card {
+      top: 72px;
+      background:
+        radial-gradient(circle at 14% 101%, #e2c1f9 0, transparent 42%),
+        radial-gradient(circle at 48% 75%, #febecf 0, transparent 45%),
+        radial-gradient(circle at 63% 15%, #fbffe4 0, transparent 48%),
+        linear-gradient(130deg, #fbf4f9 10%, #b6cff7 100%);
+    }
+    .product-top { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center; }
+    .product-name { display: flex; align-items: center; gap: 7px; font-size: 16px; font-weight: 600; }
+    .mini-logo { width: 16px; height: 16px; display: grid; place-items: center; border-radius: 50%; background: var(--ink); color: #fff; font-size: 10px; }
+    .pay-card .mini-logo { border-radius: 5px; }
+    .balance { font-size: 30px; line-height: 32px; letter-spacing: -1.1px; }
+    .order { position: absolute; z-index: 2; right: 20px; top: 58px; border: 0; border-radius: 18px; padding: 6px 10px; background: rgba(255,255,255,.82); font-size: 12px; }
+
+    .banner {
+      position: relative;
+      height: 96px;
+      margin: 0 20px 26px;
+      overflow: hidden;
+      border-radius: 22px;
+      background: var(--surface);
+    }
+    .banner img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+    .banner-copy { position: absolute; z-index: 2; top: 17px; left: 20px; width: 220px; font-size: 16px; font-weight: 600; line-height: 18px; }
+    .close {
+      position: absolute;
+      z-index: 3;
+      top: 12px;
+      right: 12px;
+      width: 24px;
+      height: 24px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(255,255,255,.94);
+      font-size: 17px;
+      line-height: 24px;
+    }
+    .dots { position: absolute; z-index: 3; bottom: 7px; left: 50%; display: flex; gap: 4px; transform: translateX(-50%); }
+    .dots i { width: 6px; height: 6px; border-radius: 50%; background: #b7bbc0; }
+    .dots i:first-child { background: var(--ink); }
+
+    .category {
+      width: calc(100% - 40px);
+      min-height: 62px;
+      margin: 0 20px 23px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 0;
+      border-radius: 20px;
+      background: var(--surface);
+      text-align: left;
+    }
+    .heart { position: relative; width: 28px; height: 28px; flex: none; transform: rotate(-12deg); }
+    .heart::before, .heart::after { content: ""; position: absolute; top: 7px; width: 16px; height: 24px; border-radius: 16px 16px 0 0; background: linear-gradient(#ff6a5f,#f92931); }
+    .heart::before { left: 13px; transform: rotate(-45deg); transform-origin: 0 100%; }
+    .heart::after { left: -3px; transform: rotate(45deg); transform-origin: 100% 100%; }
+    .category strong { flex: 1; font-size: 15px; line-height: 17px; }
+    .chevron { color: var(--secondary); font-size: 26px; font-weight: 300; }
+
+    .services { display: grid; grid-template-columns: repeat(3, 1fr); padding: 0 22px 25px; gap: 10px; }
+    .service { min-width: 0; text-align: center; font-size: 11px; line-height: 12px; }
+    .service-art { height: 61px; display: grid; place-items: center; margin-bottom: 4px; }
+    .brand-cluster { position: relative; width: 62px; height: 51px; }
+    .brand-cluster i { position: absolute; width: 24px; height: 24px; display: grid; place-items: center; border-radius: 50%; color: #fff; font-style: normal; font-size: 11px; font-weight: 700; }
+    .brand-cluster i:nth-child(1){left:2px;top:0;background:#10b7f4}.brand-cluster i:nth-child(2){left:31px;top:2px;background:#f6a500}.brand-cluster i:nth-child(3){left:4px;top:27px;background:#f1f3f5;color:#42a44a}.brand-cluster i:nth-child(4){left:34px;top:28px;background:#eff1f3;color:#999}
+    .bonus-art { width: 58px; height: 52px; position: relative; }
+    .bonus-art::before, .bonus-art::after { content:""; position:absolute; width:38px; height:47px; border-radius:10px; }
+    .bonus-art::before { left:4px; top:4px; background:#72d5f5; transform:rotate(-10deg); }
+    .bonus-art::after { right:3px; top:6px; background:#ffd55d; transform:rotate(9deg); }
+    .bonus-art b { position:absolute; z-index:2; left:19px; top:16px; font-size:20px; }
+    .market-art { width: 58px; height: 55px; border-radius: 13px; background: linear-gradient(145deg,#c9f5dc,#ffe4ee); display:grid; place-items:center; font-size:28px; }
+
+    .products { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 20px 24px; }
+    .tile { height: 128px; padding: 16px; display:flex; flex-direction:column; justify-content:space-between; border-radius:20px; background: linear-gradient(137deg, transparent 50%, rgba(24,143,199,.20)), var(--surface); }
+    .tile:nth-child(2) { background: linear-gradient(137deg, transparent 50%, rgba(181,197,6,.18)), var(--surface); }
+    .tile-name { display:flex; align-items:center; gap:6px; font-size:14px; font-weight:600; }
+    .tile-mark { width:16px; height:16px; display:grid; place-items:center; border-radius:5px; background:var(--ink); color:#fff; font-size:10px; }
+    .tile-value { font-size:22px; line-height:24px; font-weight:500; white-space:nowrap; }
+    .tile-value small { display:block; margin-top:4px; color:#188fc7; font-size:12px; line-height:14px; }
+    .tile:nth-child(2) .tile-value small { color:#899b00; }
+
+    .league { padding: 12px 20px 36px; }
+    .league-hero { position:relative; min-height:190px; padding:20px; border-radius:24px; overflow:hidden; background:radial-gradient(circle at 84% 8%,rgba(255,255,255,.9) 0,transparent 27%),radial-gradient(circle at 5% 112%,rgba(235,70,159,.3) 0,transparent 49%),linear-gradient(137deg,#fff3f7 0%,#f8c6d7 49%,#ee91b1 100%); box-shadow:inset 0 0 0 1px rgba(159,20,69,.06); }
+    .league-hero[data-gem="sapphire"] { background:radial-gradient(circle at 84% 8%,rgba(255,255,255,.9) 0,transparent 27%),radial-gradient(circle at 5% 112%,rgba(63,104,249,.25) 0,transparent 49%),linear-gradient(137deg,#f3f8ff 0%,#cadcff 49%,#92b8f4 100%); }
+    .league-hero[data-gem="emerald"] { background:radial-gradient(circle at 84% 8%,rgba(255,255,255,.9) 0,transparent 27%),radial-gradient(circle at 5% 112%,rgba(8,168,103,.24) 0,transparent 49%),linear-gradient(137deg,#f2fff8 0%,#c9f2dd 49%,#8bd4ae 100%); }
+    .league-hero[data-gem="diamond"] { background:radial-gradient(circle at 84% 8%,rgba(255,255,255,.96) 0,transparent 27%),radial-gradient(circle at 5% 112%,rgba(116,132,154,.2) 0,transparent 49%),linear-gradient(137deg,#fff 0%,#e7ebf0 49%,#c6ced8 100%); }
+    .league-hero::before { content:""; position:absolute; inset:0; background:linear-gradient(118deg,transparent 0 58%,rgba(255,255,255,.21) 58% 67%,transparent 67% 100%); pointer-events:none; }
+    .hero-gem { position:absolute; right:-15px; bottom:-36px; width:154px; height:154px; opacity:.11; transform:rotate(-8deg); }
+    .hero-gem svg { width:100%; height:100%; }
+    .league-eyebrow, .league-foot { position:relative; z-index:2; display:flex; justify-content:space-between; align-items:center; }
+    .crest { display:flex; align-items:center; gap:8px; font-size:16px; font-weight:600; }
+    .crest .league-mark { width:34px; height:34px; display:grid; place-items:center; flex:none; }
+    .crest .league-mark svg { width:32px; height:32px; overflow:visible; filter:drop-shadow(0 4px 5px rgba(116,18,48,.18)); }
+    .league-eyebrow small { color:var(--secondary); font-size:11px; }
+    .place { position:relative; z-index:2; margin-top:23px; font-size:36px; font-weight:600; letter-spacing:-1.2px; }
+    .place small { display:block; margin-top:1px; color:var(--secondary); font-size:12px; font-weight:400; letter-spacing:0; }
+    .league-foot { margin-top:17px; align-items:flex-end; font-size:12px; }
+    .league-foot b { display:block; margin-top:2px; font-size:18px; }
+    .league-foot button { border:0; padding:9px 12px; border-radius:16px; background:#fff; font-size:12px; font-weight:600; }
+    .daily { width:100%; margin-top:12px; padding:15px; display:flex; align-items:center; gap:12px; border:0; border-radius:22px; background:var(--surface); text-align:left; }
+    .daily-icon { width:44px; height:44px; display:grid; place-items:center; flex:none; border-radius:14px; background:#fff; font-size:22px; }
+    .tasks-logo { background:transparent; }
+    .tasks-logo svg { width:42px; height:42px; overflow:visible; filter:drop-shadow(0 5px 6px rgba(87,50,132,.16)); }
+    .daily-copy { flex:1; }
+    .daily-copy strong { display:block; font-size:15px; line-height:18px; }
+    .daily-copy small { color:var(--secondary); font-size:11px; }
+    .streak { margin:12px 0 24px; padding:16px; border-radius:22px; background:#f2effb; }
+    .streak-head { display:flex; align-items:center; justify-content:space-between; font-size:15px; font-weight:600; }
+    .multiplier { padding:6px 8px; border-radius:14px; background:#fff; font-size:11px; }
+    .days { display:flex; justify-content:space-between; margin-top:14px; }
+    .days i { width:31px; height:31px; display:grid; place-items:center; border-radius:50%; background:#fff; color:#888; font-size:10px; font-style:normal; }
+    .days .done { background:var(--ink); color:#fff; }
+    .days .next { border:2px solid var(--ink); color:var(--ink); }
+    .section-head { display:flex; align-items:center; justify-content:space-between; margin:0 2px 12px; }
+    .section-head h2 { margin:0; font-size:21px; letter-spacing:-.4px; }
+    .section-head span { color:var(--secondary); font-size:11px; }
+    .challenge { padding:16px; border-radius:21px; background:var(--surface); }
+    .challenge-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+    .challenge-top h3 { margin:0; font-size:16px; line-height:19px; }
+    .challenge-reward { flex:none; padding:6px 9px; border-radius:14px; background:var(--ink); color:#fff; font-size:11px; font-weight:600; white-space:nowrap; }
+    .challenge > p { margin:6px 0 0; color:var(--secondary); font-size:12px; line-height:15px; }
+    .journey { position:relative; display:grid; grid-template-columns:repeat(4,1fr); gap:3px; margin-top:18px; }
+    .journey::before { content:""; position:absolute; z-index:0; top:20px; right:12%; left:12%; height:3px; border-radius:3px; background:#dcdfe2; }
+    .journey-progress { position:absolute; z-index:1; top:20px; left:12%; width:25.4%; height:3px; border-radius:3px; background:var(--ink); }
+    .checkpoint { position:relative; z-index:2; min-width:0; text-align:center; }
+    .checkpoint-dot { width:42px; height:42px; margin:0 auto; display:grid; place-items:center; border:2px solid #dcdfe2; border-radius:50%; background:#fff; color:var(--secondary); font-size:16px; font-weight:600; }
+    .checkpoint.done .checkpoint-dot { border-color:var(--ink); background:var(--ink); color:#fff; }
+    .checkpoint.current .checkpoint-dot { border-color:var(--ink); color:var(--ink); box-shadow:0 0 0 4px rgba(0,0,0,.06); }
+    .checkpoint-label { display:block; margin-top:8px; font-size:10px; font-weight:600; line-height:12px; }
+    .checkpoint small { display:block; margin-top:2px; color:var(--secondary); font-size:9px; line-height:11px; }
+    .challenge-footer { display:flex; align-items:center; justify-content:space-between; margin-top:15px; padding-top:12px; border-top:1px solid rgba(0,0,0,.07); color:var(--secondary); font-size:11px; }
+    .challenge-footer strong { color:var(--ink); font-size:12px; }
+    .team-list { margin-top:24px; }
+    .team { display:flex; align-items:center; gap:10px; padding:11px 2px; border-bottom:1px solid #ededed; }
+    .team.my-league { margin:3px -10px; padding:12px 10px; border-bottom-color:transparent; border-radius:17px; background:#f2effb; }
+    .team-number { width:17px; color:var(--secondary); font-size:12px; }
+    .team-badge { width:34px; height:34px; display:grid; place-items:center; }
+    .gem-badge svg { width:30px; height:30px; overflow:visible; filter:drop-shadow(0 3px 4px rgba(0,0,0,.13)); }
+    .team-copy { flex:1; }
+    .team-copy strong { display:block; font-size:14px; }
+    .team-copy small { color:var(--secondary); font-size:10px; }
+    .team-score { flex:none; text-align:right; font-size:13px; font-weight:600; font-variant-numeric:tabular-nums; }
+    .season-final { margin-top:24px; padding:18px; border-radius:22px; background:#171717; color:#fff; }
+    .season-final-top { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .season-final-kicker { color:rgba(255,255,255,.6); font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; }
+    .season-final-duration { padding:6px 9px; border-radius:13px; background:#fff; color:var(--ink); font-size:11px; font-weight:600; white-space:nowrap; }
+    .season-final h3 { margin:15px 0 0; max-width:285px; font-size:18px; line-height:21px; }
+    .season-final p { margin:7px 0 0; color:rgba(255,255,255,.62); font-size:12px; line-height:16px; }
+    .season-final-footer { display:flex; align-items:center; gap:8px; margin-top:16px; padding-top:13px; border-top:1px solid rgba(255,255,255,.14); font-size:11px; }
+    .season-final-footer b { font-size:13px; }
+
+    .tasks-panel, .standings-panel {
+      position:absolute;
+      z-index:45;
+      top:92px;
+      right:0;
+      bottom:0;
+      left:0;
+      overflow-y:auto;
+      overscroll-behavior:contain;
+      scrollbar-width:none;
+      background:#fff;
+      transform:translateX(100%);
+      visibility:hidden;
+      transition:transform .24s ease, visibility 0s linear .24s;
+    }
+    .tasks-panel::-webkit-scrollbar, .standings-panel::-webkit-scrollbar { display:none; }
+    .tasks-panel.open, .standings-panel.open { transform:translateX(0); visibility:visible; transition-delay:0s; }
+    .tasks-header { position:sticky; z-index:2; top:0; padding:12px 20px 14px; background:rgba(255,255,255,.96); backdrop-filter:blur(14px); }
+    .tasks-nav { display:flex; align-items:center; gap:10px; }
+    .back-button { width:38px; height:38px; display:grid; place-items:center; flex:none; border:0; border-radius:50%; background:var(--surface); font-size:25px; line-height:1; cursor:pointer; }
+    .tasks-title { margin:0; font-size:25px; line-height:30px; letter-spacing:-.7px; }
+    .tasks-summary { margin:10px 0 0 48px; color:var(--secondary); font-size:12px; line-height:16px; }
+    .task-list { display:flex; flex-direction:column; gap:8px; padding:0 20px 30px; }
+    .task-card { min-height:72px; display:flex; align-items:center; gap:12px; padding:13px 14px; border-radius:20px; background:var(--surface); }
+    .task-icon { width:42px; height:42px; display:grid; place-items:center; flex:none; border-radius:13px; background:#fff; font-size:21px; }
+    .task-copy { min-width:0; flex:1; }
+    .task-copy strong { display:block; font-size:14px; line-height:17px; }
+    .task-copy small { display:block; margin-top:3px; color:var(--secondary); font-size:11px; line-height:14px; }
+    .task-points { flex:none; padding:6px 9px; border-radius:14px; background:#fff; font-size:12px; font-weight:600; white-space:nowrap; }
+    .task-card.featured { background:linear-gradient(135deg,#fff1f4,#edf2ff); }
+    .task-card.featured .task-points { background:var(--ink); color:#fff; }
+
+    .standings-switch { display:grid; grid-template-columns:1fr 1fr; gap:3px; margin:0 20px 14px; padding:3px; border-radius:16px; background:var(--surface); }
+    .standings-switch button { height:38px; border:0; border-radius:13px; background:transparent; color:var(--secondary); font-size:13px; font-weight:600; cursor:pointer; }
+    .standings-switch button.active { background:#fff; color:var(--ink); box-shadow:0 2px 10px rgba(0,0,0,.07); }
+    .standings-context { display:flex; align-items:center; justify-content:space-between; margin:0 20px 14px; }
+    .standings-context strong { font-size:15px; }
+    .standings-context span { color:var(--secondary); font-size:11px; }
+    .standing-head, .standing-row { display:grid; grid-template-columns:28px minmax(0,1fr) 82px 54px 40px; gap:5px; align-items:center; }
+    .standing-head { margin:0 20px 6px; padding:0 8px; color:var(--secondary); font-size:9px; line-height:11px; }
+    .standing-head span:nth-last-child(-n+2) { text-align:right; }
+    .standing-list { display:flex; flex-direction:column; gap:7px; padding:0 20px 30px; }
+    .standing-row { position:relative; min-height:67px; padding:10px 8px; overflow:hidden; border-radius:18px; background:var(--surface); }
+    .standing-row.podium-1 { min-height:76px; background:#171717; color:#fff; }
+    .standing-row.podium-2 { background:linear-gradient(110deg,#f8f9fa,#e8ebef); }
+    .standing-row.podium-3 { background:linear-gradient(110deg,#f8f5f2,#eadfd7); }
+    .standing-row.current-user::after { content:""; position:absolute; inset:0; border:2px solid #eb469f; border-radius:18px; pointer-events:none; }
+    .rank-badge { width:27px; height:32px; display:grid; place-items:center; border-radius:8px; background:#fff; color:var(--ink); font-size:14px; font-weight:700; }
+    .podium-1 .rank-badge { background:#fff; }
+    .podium-2 .rank-badge { background:#d8dce2; }
+    .podium-3 .rank-badge { background:#dbc4b2; }
+    .standing-name { min-width:0; }
+    .standing-name strong { display:block; overflow:hidden; font-size:13px; line-height:16px; text-overflow:ellipsis; white-space:nowrap; }
+    .standing-name small { display:block; margin-top:3px; color:var(--secondary); font-size:9px; }
+    .podium-1 .standing-name small, .podium-1 .standing-team small { color:rgba(255,255,255,.58); }
+    .you-mark { display:inline-block; margin-left:4px; padding:2px 5px; border-radius:7px; background:linear-gradient(90deg,#eb469f,#8341ef); color:#fff; font-size:8px; vertical-align:1px; }
+    .standing-team { min-width:0; display:flex; align-items:center; gap:5px; }
+    .faculty-mark { width:25px; height:25px; display:grid; place-items:center; flex:none; }
+    .faculty-mark svg { width:23px; height:23px; overflow:visible; filter:drop-shadow(0 2px 3px rgba(0,0,0,.13)); }
+    .standing-team small { overflow:hidden; color:var(--secondary); font-size:9px; line-height:11px; text-overflow:ellipsis; white-space:nowrap; }
+    .standing-points, .standing-gap { text-align:right; white-space:nowrap; }
+    .standing-points { font-size:12px; font-weight:700; }
+    .standing-gap { color:var(--secondary); font-size:10px; }
+    .podium-1 .standing-gap { color:rgba(255,255,255,.62); }
+    .standings-note { margin:0 20px 26px; padding:13px 14px; border-radius:17px; background:#f2effb; color:var(--secondary); font-size:11px; line-height:15px; }
+
+    .onboarding-view { min-height:100%; background:#fff; }
+    .onboarding { min-height:100%; padding:16px 20px 28px; }
+    .onboarding-step { display:none; min-height:100%; flex-direction:column; }
+    .onboarding-step.active { display:flex; }
+    .onboarding-kicker { margin:0 0 8px; color:var(--secondary); font-size:12px; font-weight:600; }
+    .onboarding-title { margin:0; max-width:330px; font-size:31px; line-height:34px; letter-spacing:-1px; }
+    .onboarding-copy { margin:12px 0 0; max-width:320px; color:var(--secondary); font-size:14px; line-height:19px; }
+    .karat-hero { width:158px; height:158px; margin:36px auto 18px; }
+    .karat-hero.compact { width:116px; height:116px; margin:28px auto 14px; }
+    .karat-hero svg { width:100%; height:100%; overflow:visible; filter:drop-shadow(0 18px 20px rgba(77,46,98,.18)); }
+    .karat-name { align-self:center; margin:0 0 6px; padding:5px 9px; border-radius:12px; background:#f2effb; color:#65467b; font-size:11px; font-weight:600; }
+    .onboarding-actions { margin-top:auto; padding-top:24px; }
+    .onboarding-primary { width:100%; min-height:52px; border:0; border-radius:18px; background:var(--ink); color:#fff; font-size:15px; font-weight:600; cursor:pointer; }
+    .onboarding-primary:disabled { background:#d9dce0; color:#8b8f94; cursor:default; }
+    .onboarding-primary:focus-visible, .quiz-option:focus-visible, .gem-choice:focus-visible, .quiz-back:focus-visible { outline:3px solid rgba(63,104,249,.28); outline-offset:2px; }
+    .intro-message { margin:0 auto; max-width:310px; text-align:center; }
+    .intro-message .onboarding-title { font-size:27px; line-height:31px; }
+    .intro-message .onboarding-copy { margin-right:auto; margin-left:auto; }
+    .quiz-top { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+    .quiz-back { width:36px; height:36px; display:grid; place-items:center; flex:none; border:0; border-radius:50%; background:var(--surface); font-size:23px; cursor:pointer; }
+    .quiz-progress-wrap { flex:1; }
+    .quiz-count { display:block; margin-bottom:7px; color:var(--secondary); font-size:10px; }
+    .quiz-progress { height:4px; overflow:hidden; border-radius:4px; background:#ebeef1; }
+    .quiz-progress span { display:block; height:100%; border-radius:inherit; background:var(--ink); }
+    .quiz-question { margin:4px 0 8px; font-size:25px; line-height:29px; letter-spacing:-.6px; }
+    .quiz-hint { margin:0 0 20px; color:var(--secondary); font-size:12px; line-height:16px; }
+    .nickname-input { width:100%; height:58px; padding:0 17px; border:1.5px solid #dfe2e6; border-radius:18px; background:#fff; font-size:18px; outline:none; }
+    .nickname-input:focus { border-color:var(--ink); box-shadow:0 0 0 3px rgba(0,0,0,.05); }
+    .nickname-caption { display:block; margin:8px 3px 0; color:var(--secondary); font-size:11px; line-height:15px; }
+    .quiz-options { display:flex; flex-direction:column; gap:8px; }
+    .quiz-option { width:100%; min-height:58px; display:flex; align-items:center; gap:11px; padding:12px 14px; border:0; border-radius:18px; background:var(--surface); text-align:left; font-size:13px; line-height:17px; cursor:pointer; }
+    .quiz-option i { width:30px; height:30px; display:grid; place-items:center; flex:none; border-radius:10px; background:#fff; font-style:normal; font-size:15px; }
+    .quiz-option.selected { box-shadow:inset 0 0 0 2px var(--ink); }
+    .result-head { text-align:center; }
+    .result-head .onboarding-title, .result-head .onboarding-copy { margin-right:auto; margin-left:auto; }
+    .result-mini-karat { width:72px; height:72px; margin:4px auto 10px; }
+    .result-mini-karat svg { width:100%; height:100%; filter:drop-shadow(0 8px 10px rgba(77,46,98,.16)); }
+    .gem-choices { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:22px; }
+    .gem-choice { min-height:178px; padding:16px 10px 14px; display:flex; flex-direction:column; align-items:center; border:0; border-radius:22px; background:var(--surface); text-align:center; cursor:pointer; }
+    .gem-choice svg { width:72px; height:72px; overflow:visible; filter:drop-shadow(0 8px 8px rgba(0,0,0,.14)); }
+    .gem-choice strong { margin-top:10px; font-size:16px; }
+    .gem-choice small { margin-top:5px; color:var(--secondary); font-size:10px; line-height:13px; }
+    .final-gem { width:142px; height:142px; margin:38px auto 18px; }
+    .final-gem svg { width:100%; height:100%; overflow:visible; filter:drop-shadow(0 18px 16px rgba(0,0,0,.16)); }
+    .final-copy { text-align:center; }
+    .final-copy .onboarding-title, .final-copy .onboarding-copy { margin-right:auto; margin-left:auto; }
+
+    .placeholder { min-height: 100%; display:grid; place-items:center; padding:30px; text-align:center; color:var(--secondary); }
+
+    .tabbar {
+      position: absolute;
+      z-index: 30;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 65px;
+      background: #fff;
+      border-top: .5px solid var(--line);
+    }
+    .tabs { height: 47px; display:grid; grid-template-columns:repeat(4,1fr); }
+    .tab {
+      min-width:0;
+      padding:5px 2px 4px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      border:0;
+      background:transparent;
+      color:var(--secondary);
+      font-size:11px;
+      font-weight:500;
+      line-height:12px;
+      cursor:pointer;
+    }
+    .tab.active { color:var(--ink); }
+    .tab:focus { outline: none; }
+    .tab:focus-visible { box-shadow: inset 0 0 0 2px rgba(63,104,249,.28); }
+    .tab img { width:28px; height:28px; object-fit:contain; opacity:.52; }
+    .tab.active img { opacity:.92; }
+    .home-indicator { height:18px; display:grid; place-items:start center; padding-top:7px; }
+    .home-indicator::before { content:""; width:72px; height:3px; border-radius:2px; background:var(--ink); }
+
+    .toast { position:absolute; z-index:50; left:20px; right:20px; bottom:78px; padding:13px; border-radius:17px; background:var(--ink); color:#fff; text-align:center; font-size:13px; opacity:0; transform:translateY(7px); transition:.2s; pointer-events:none; }
+    .toast.show { opacity:1; transform:none; }
+
+    @media (max-width: 440px) {
+      body { height:auto; min-height:100dvh; overflow:auto; padding:0; background:#fff; }
+      .phone { width:100vw; height:100dvh; border-radius:0; box-shadow:none; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Base: Figma file OZ65UcqmXeGjNE4QWnUrPN, node 1448:16214. -->
+  <!-- Naming shortlist: Дракон / Грифон / Феникс / Единорог / Пегас; Дукат / Флорин / Талер / Гинея; Алмаз / Сапфир / Изумруд / Рубин. -->
+  <!--
+    Подумать:
+    1. Добавить коллекционные награды за игру: скины, виртуальные артефакты и подарки, которые дают дополнительную эмоцию и ощущение выигрыша.
+    2. Добавить эксклюзивные плюшки от Фантеха.
+    3. Кандидат для задания на неделю или условия серии: хранить на балансе определённую сумму денег в течение заданного периода.
+  -->
+  <main class="phone" id="app">
+    <svg class="icon-sprite" aria-hidden="true">
+      <symbol id="gem-diamond-icon" viewBox="0 0 32 32">
+        <path fill="#dce3eb" d="M16 2 29 16 16 30 3 16Z"/>
+        <path fill="#f8fbff" d="M16 2 16 16 3 16Z"/>
+        <path fill="#b8c3d0" d="M16 2 29 16 16 16Z"/>
+        <path fill="#9ca9b8" d="M16 16 29 16 16 30Z"/>
+        <path fill="#c8d1dc" d="M3 16 16 16 16 30Z"/>
+        <path fill="#fff" d="m9 10 3-4 2 1-4 4Z" opacity=".92"/>
+      </symbol>
+      <symbol id="gem-sapphire-icon" viewBox="0 0 32 32">
+        <path fill="#246bd4" d="M8 5 17 2 25 7 29 15 24 25 14 30 6 25 3 16Z"/>
+        <path fill="#5598f4" d="M8 5 17 2 14 16 3 16Z"/>
+        <path fill="#1d55b2" d="m17 2 8 5 4 8-15 1Z"/>
+        <path fill="#16448f" d="m14 16 15-1-5 10-10 5Z"/>
+        <path fill="#347fe8" d="m3 16 11 0v14l-8-5Z"/>
+        <path fill="#b7d7ff" d="m9 8 4-2 2 2-5 3Z" opacity=".9"/>
+      </symbol>
+      <symbol id="gem-emerald-icon" viewBox="0 0 32 32">
+        <path fill="#08a867" d="M9 3 21 4 27 10 24 27 11 30 5 23 6 9Z"/>
+        <path fill="#43cc8e" d="m9 3 6 4-2 19-8-3 1-14Z"/>
+        <path fill="#08794d" d="m15 7 6-3 6 6-4 16-10 0Z"/>
+        <path fill="#18b976" d="m13 26 10 0-12 4-6-7Z"/>
+        <path fill="#a2f0c9" d="m9 7 4 1-1 8-3 2Z" opacity=".85"/>
+      </symbol>
+      <symbol id="gem-ruby-icon" viewBox="0 0 32 32">
+        <path fill="#e42c58" d="M7 7 15 2 24 6 29 14 25 24 16 30 7 26 3 17Z"/>
+        <path fill="#ff6685" d="m7 7 8-5-1 14-11 1Z"/>
+        <path fill="#c21843" d="m15 2 9 4 5 8-15 2Z"/>
+        <path fill="#a70f36" d="m14 16 15-2-4 10-9 6Z"/>
+        <path fill="#d92152" d="m3 17 11-1 2 14-9-4Z"/>
+        <path fill="#ffd1dc" d="m8 10 4-4 2 2-4 5Z" opacity=".9"/>
+      </symbol>
+      <symbol id="tasks-chest-icon" viewBox="0 0 48 48">
+        <path fill="#604575" d="M7 19c1-8 7-13 17-13s16 5 17 13l-5 4H12Z"/>
+        <path fill="#8d69a5" d="M11 18c2-5 6-8 13-8s11 3 13 8l-4 2H15Z"/>
+        <circle cx="20" cy="17" r="2" fill="#2f2338"/>
+        <circle cx="28" cy="17" r="2" fill="#2f2338"/>
+        <circle cx="19.4" cy="16.4" r=".6" fill="#fff"/>
+        <circle cx="27.4" cy="16.4" r=".6" fill="#fff"/>
+        <path fill="#35253f" d="M8 20h32v6H8Z"/>
+        <path fill="#eb469f" d="M7 24h34l-3 17H10Z"/>
+        <path fill="#bd2878" d="M24 24h17l-3 17H24Z"/>
+        <path fill="#ffd45c" d="M7 22h34v5H7Z"/>
+        <path fill="#fff0a8" d="M10 22h14v2H10Z"/>
+        <rect width="8" height="10" x="20" y="25" fill="#ffbd2e" rx="2"/>
+        <rect width="4" height="4" x="22" y="28" fill="#fff3b8" rx="1"/>
+        <path fill="#8341ef" d="m38 6 1.4 3.6L43 11l-3.6 1.4L38 16l-1.4-3.6L33 11l3.6-1.4Z"/>
+      </symbol>
+    </svg>
+    <header class="statusbar">
+      <span>15:07</span>
+      <span class="system-icons">
+        <img class="cellular" src="figma-assets/cellular.svg" alt="">
+        <img class="wifi" src="figma-assets/wifi.svg" alt="">
+        <span class="battery" aria-hidden="true"></span>
+      </span>
+    </header>
+
+    <div class="navbar">
+      <div class="pay-logo" aria-label="Яндекс Пэй">
+        <img src="figma-assets/logo-mark.svg" alt="">
+        <img src="figma-assets/logo-text.svg" alt="Пэй">
+      </div>
+      <div class="profile">
+        <button class="plus-counter"><span>1706</span><img src="figma-assets/plus-glyph.svg" alt="Плюс"></button>
+        <span class="avatar">
+          <img class="photo" src="figma-assets/avatar.png" alt="Профиль">
+          <img class="ring" src="figma-assets/avatar-plus.svg" alt="">
+        </span>
+      </div>
+    </div>
+
+    <section class="screen">
+      <div class="view active" data-view="main">
+        <div class="product-stack">
+          <article class="product-card split-card">
+            <div class="product-top"><span class="product-name"><i class="mini-logo">‹</i>Сплит</span><span>130 000 ₽</span></div>
+          </article>
+          <article class="product-card pay-card">
+            <div class="product-top"><span class="product-name"><i class="mini-logo">Я</i>Карта</span><span class="balance">15 000 ₽</span></div>
+            <button class="order">＋ Заказать</button>
+          </article>
+        </div>
+
+        <article class="banner">
+          <img src="figma-assets/promo.png" alt="Сейв на любую цель">
+          <div class="banner-copy">На любую цель и всякий случай — сейвите<br>со ставкой до 16,3%</div>
+          <button class="close" aria-label="Закрыть">×</button>
+          <span class="dots"><i></i><i></i><i></i></span>
+        </article>
+
+        <button class="category"><span class="heart" aria-hidden="true"></span><strong>Выберите ещё 1 категорию<br>на январь</strong><span class="chevron">›</span></button>
+
+        <div class="services">
+          <div class="service"><div class="service-art"><span class="brand-cluster"><i>V</i><i>🍴</i><i>▶</i><i>＋</i></span></div>Выгода<br>в январе</div>
+          <div class="service"><div class="service-art"><span class="bonus-art"><b>%</b></span></div>Бонусы<br>за остаток</div>
+          <div class="service"><div class="service-art"><span class="market-art">🧑🏻‍🚀</span></div>Магазины<br>с Яндекс Пэй</div>
+        </div>
+
+        <div class="products">
+          <article class="tile"><div class="tile-name"><span class="tile-mark">✿</span>Сейвы</div><div class="tile-value">1 203 964 ₽<small>+20 394 ₽ за всё время</small></div></article>
+          <article class="tile"><div class="tile-name"><span class="tile-mark">S7</span>Мили S7</div><div class="tile-value">22 960 M<small>+2394 за февраль</small></div></article>
+        </div>
+      </div>
+
+      <div class="view" data-view="stores"><div class="placeholder"><p>Экран «Магазины» не менялся.<br>В прототипе проверяется новая вкладка «Лиги».</p></div></div>
+      <div class="view" data-view="payments"><div class="placeholder"><p>Экран «Платежи» не менялся.<br>В прототипе проверяется новая вкладка «Лиги».</p></div></div>
+
+      <div class="view onboarding-view" data-view="onboarding">
+        <div class="onboarding" id="onboarding-flow">
+          <section class="onboarding-step active" data-onboarding-step="welcome">
+            <p class="onboarding-kicker">Новый сезон</p>
+            <h1 class="onboarding-title">Поучаствовать в сезоне</h1>
+            <p class="onboarding-copy">Сезон длится три месяца. Вступить можно в первые два — общий срок от этого не изменится.</p>
+            <div class="karat-hero" aria-hidden="true"><svg viewBox="0 0 48 48"><use href="#tasks-chest-icon"/></svg></div>
+            <span class="karat-name">Карат</span>
+            <div class="onboarding-actions"><button class="onboarding-primary" type="button" data-onboarding-next="intro">Поучаствовать</button></div>
+          </section>
+
+          <section class="onboarding-step" data-onboarding-step="intro">
+            <div class="karat-hero compact" aria-hidden="true"><svg viewBox="0 0 48 48"><use href="#tasks-chest-icon"/></svg></div>
+            <span class="karat-name">Карат</span>
+            <div class="intro-message">
+              <h1 class="onboarding-title">Перед тем, как принять участие, давай познакомимся?</h1>
+              <p class="onboarding-copy">Я задам несколько вопросов, чтобы увидеть твои грани и найти подходящие камни.</p>
+            </div>
+            <div class="onboarding-actions"><button class="onboarding-primary" type="button" data-onboarding-next="nickname">Давай</button></div>
+          </section>
+
+          <section class="onboarding-step" data-onboarding-step="nickname">
+            <div class="quiz-top"><button class="quiz-back" type="button" data-onboarding-back="intro" aria-label="Назад">‹</button><div class="quiz-progress-wrap"><span class="quiz-count">1 из 4</span><div class="quiz-progress"><span style="width:25%"></span></div></div></div>
+            <h2 class="quiz-question">Как я могу к тебе обращаться?</h2>
+            <p class="quiz-hint">Можно использовать имя или любой ник.</p>
+            <form id="nickname-form">
+              <input class="nickname-input" id="nickname-input" name="nickname" maxlength="20" autocomplete="off" placeholder="Например, Аня" aria-describedby="nickname-caption">
+              <small class="nickname-caption" id="nickname-caption">Это будет твоим ником в турнирной таблице.</small>
+              <div class="onboarding-actions"><button class="onboarding-primary" id="nickname-submit" type="submit" disabled>Продолжить</button></div>
+            </form>
+          </section>
+
+          <section class="onboarding-step" data-onboarding-step="free-time">
+            <div class="quiz-top"><button class="quiz-back" type="button" data-onboarding-back="nickname" aria-label="Назад">‹</button><div class="quiz-progress-wrap"><span class="quiz-count">2 из 4</span><div class="quiz-progress"><span style="width:50%"></span></div></div></div>
+            <h2 class="quiz-question">Появилось свободных 15 минут. Что выберешь?</h2>
+            <p class="quiz-hint">Здесь нет правильных ответов — выбирай то, что ближе.</p>
+            <div class="quiz-options" data-question="free-time">
+              <button class="quiz-option" type="button" data-gem="ruby" data-next-step="team-role"><i>↗</i><span>Сделаю одно полезное дело прямо сейчас</span></button>
+              <button class="quiz-option" type="button" data-gem="sapphire" data-next-step="team-role"><i>⌁</i><span>Сначала посмотрю, что даст больше результата</span></button>
+              <button class="quiz-option" type="button" data-gem="emerald" data-next-step="team-role"><i>＋</i><span>Продолжу то, что уже начал</span></button>
+              <button class="quiz-option" type="button" data-gem="diamond" data-next-step="team-role"><i>◇</i><span>Разберусь и выберу самый короткий путь</span></button>
+            </div>
+          </section>
+
+          <section class="onboarding-step" data-onboarding-step="team-role">
+            <div class="quiz-top"><button class="quiz-back" type="button" data-onboarding-back="free-time" aria-label="Назад">‹</button><div class="quiz-progress-wrap"><span class="quiz-count">3 из 4</span><div class="quiz-progress"><span style="width:75%"></span></div></div></div>
+            <h2 class="quiz-question">В командном челлендже ты чаще…</h2>
+            <p class="quiz-hint">Выбери роль, которую обычно берёшь на себя.</p>
+            <div class="quiz-options" data-question="team-role">
+              <button class="quiz-option" type="button" data-gem="ruby" data-next-step="result-style"><i>⚡</i><span>Задаю темп и начинаю первым</span></button>
+              <button class="quiz-option" type="button" data-gem="sapphire" data-next-step="result-style"><i>≡</i><span>Предлагаю план и распределяю шаги</span></button>
+              <button class="quiz-option" type="button" data-gem="emerald" data-next-step="result-style"><i>∞</i><span>Поддерживаю ритм, чтобы никто не выпал</span></button>
+              <button class="quiz-option" type="button" data-gem="diamond" data-next-step="result-style"><i>✦</i><span>Нахожу простой способ дойти до цели</span></button>
+            </div>
+          </section>
+
+          <section class="onboarding-step" data-onboarding-step="result-style">
+            <div class="quiz-top"><button class="quiz-back" type="button" data-onboarding-back="team-role" aria-label="Назад">‹</button><div class="quiz-progress-wrap"><span class="quiz-count">4 из 4</span><div class="quiz-progress"><span style="width:100%"></span></div></div></div>
+            <h2 class="quiz-question">Как приятнее получать результат?</h2>
+            <p class="quiz-hint">Последний вопрос — и Карат покажет твои грани.</p>
+            <div class="quiz-options" data-question="result-style">
+              <button class="quiz-option" type="button" data-gem="ruby" data-next-step="facets"><i>●</i><span>Ярким рывком и с заметным эффектом</span></button>
+              <button class="quiz-option" type="button" data-gem="sapphire" data-next-step="facets"><i>◫</i><span>По продуманной стратегии</span></button>
+              <button class="quiz-option" type="button" data-gem="emerald" data-next-step="facets"><i>◌</i><span>Понемногу каждый день</span></button>
+              <button class="quiz-option" type="button" data-gem="diamond" data-next-step="facets"><i>◆</i><span>За счёт одного точного решения</span></button>
+            </div>
+          </section>
+
+          <section class="onboarding-step" data-onboarding-step="facets">
+            <div class="result-head">
+              <div class="result-mini-karat" aria-hidden="true"><svg viewBox="0 0 48 48"><use href="#tasks-chest-icon"/></svg></div>
+              <span class="karat-name">Карат видит твои грани</span>
+              <h2 class="onboarding-title" id="facets-title">Тебе близки два камня</h2>
+              <p class="onboarding-copy">Выбери камень, с которым хочешь начать сезон.</p>
+            </div>
+            <div class="gem-choices" id="gem-choices"></div>
+            <div class="onboarding-actions"><button class="onboarding-primary" type="button" data-onboarding-back="result-style">Вернуться к ответам</button></div>
+          </section>
+
+          <section class="onboarding-step" data-onboarding-step="final">
+            <div class="final-gem" aria-hidden="true"><svg viewBox="0 0 32 32"><use id="final-gem-use" href="#gem-ruby-icon"/></svg></div>
+            <div class="final-copy">
+              <p class="onboarding-kicker">Твоя лига</p>
+              <h2 class="onboarding-title" id="final-title">Ты в лиге Рубина</h2>
+              <p class="onboarding-copy" id="final-description">Быстро включаешься, задаёшь темп и любишь видеть результат.</p>
+            </div>
+            <div class="onboarding-actions"><button class="onboarding-primary" id="enter-league" type="button">Перейти в лигу</button></div>
+          </section>
+        </div>
+      </div>
+
+      <div class="view" data-view="leagues">
+        <div class="league">
+          <section class="league-hero" id="current-league-hero" data-gem="ruby">
+            <span class="hero-gem" aria-hidden="true"><svg viewBox="0 0 32 32"><use id="hero-gem-use" href="#gem-ruby-icon"/></svg></span>
+            <div class="league-eyebrow"><span class="crest"><i class="league-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><use id="league-mark-use" href="#gem-ruby-icon"/></svg></i><span id="current-league-name">Рубин</span></span><small>2-й месяц из 3</small></div>
+            <div class="place" id="current-league-place">2 место<small id="current-league-gap">до первого — 27 240 баллов</small></div>
+            <div class="league-foot"><span>Твой вклад в сезон<b>1 146</b></span><button type="button" id="open-standings">Таблица →</button></div>
+          </section>
+
+          <button class="daily" id="open-tasks" type="button"><span class="daily-icon tasks-logo" aria-hidden="true"><svg viewBox="0 0 48 48"><use href="#tasks-chest-icon"/></svg></span><span class="daily-copy"><strong>Задания на сегодня</strong><small>10 быстрых действий · обновятся завтра</small></span><span class="chevron">›</span></button>
+
+          <section class="streak">
+            <div class="streak-head"><span>🔥 Серия: 5 дней</span><span class="multiplier">ещё 2 до ×1,25</span></div>
+            <div class="days"><i class="done">Пн</i><i class="done">Вт</i><i class="done">Ср</i><i class="done">Чт</i><i class="done">Пт</i><i class="next">Сб</i><i>Вс</i></div>
+          </section>
+
+          <div class="section-head"><h2>Челлендж недели</h2><span>до воскресенья</span></div>
+          <article class="challenge">
+            <div class="challenge-top"><h3>Получи пластиковую карту</h3><span class="challenge-reward">+1000 баллов</span></div>
+            <p>Пройди весь путь от заказа до первой оплаты.</p>
+            <div class="journey" aria-label="Пройден 1 из 4 этапов">
+              <span class="journey-progress" aria-hidden="true"></span>
+              <div class="checkpoint done"><span class="checkpoint-dot">✓</span><span class="checkpoint-label">Заказать</span><small>готово</small></div>
+              <div class="checkpoint current"><span class="checkpoint-dot">2</span><span class="checkpoint-label">Забрать<br>в ПВЗ</span><small>сейчас</small></div>
+              <div class="checkpoint"><span class="checkpoint-dot">3</span><span class="checkpoint-label">Активировать</span><small>дальше</small></div>
+              <div class="checkpoint"><span class="checkpoint-dot">4</span><span class="checkpoint-label">Первая<br>оплата</span><small>финал</small></div>
+            </div>
+            <div class="challenge-footer"><strong>1 из 4 этапов пройден</strong><span>ещё 3 шага</span></div>
+          </article>
+
+          <section class="team-list">
+            <div class="section-head"><h2>Лиги</h2><span>общий результат сезона</span></div>
+            <div class="team" data-league-gem="emerald"><span class="team-number">1</span><span class="team-badge gem-badge" aria-hidden="true"><svg viewBox="0 0 32 32"><use href="#gem-emerald-icon"/></svg></span><span class="team-copy"><strong>Изумруд</strong><small class="league-status">вклад участников</small></span><span class="team-score">1 428 500</span></div>
+            <div class="team my-league" data-league-gem="ruby"><span class="team-number">2</span><span class="team-badge gem-badge" aria-hidden="true"><svg viewBox="0 0 32 32"><use href="#gem-ruby-icon"/></svg></span><span class="team-copy"><strong>Рубин</strong><small class="league-status">твой вклад · 1 146</small></span><span class="team-score">1 401 260</span></div>
+            <div class="team" data-league-gem="sapphire"><span class="team-number">3</span><span class="team-badge gem-badge" aria-hidden="true"><svg viewBox="0 0 32 32"><use href="#gem-sapphire-icon"/></svg></span><span class="team-copy"><strong>Сапфир</strong><small class="league-status">вклад участников</small></span><span class="team-score">1 376 940</span></div>
+            <div class="team" data-league-gem="diamond"><span class="team-number">4</span><span class="team-badge gem-badge" aria-hidden="true"><svg viewBox="0 0 32 32"><use href="#gem-diamond-icon"/></svg></span><span class="team-copy"><strong>Алмаз</strong><small class="league-status">вклад участников</small></span><span class="team-score">1 332 780</span></div>
+          </section>
+
+          <section class="season-final">
+            <div class="season-final-top"><span class="season-final-kicker">Финал квартала</span><span class="season-final-duration">7 дней</span></div>
+            <h3>Победившая лига выходит в спецтурнир</h3>
+            <p>Неделя сложных заданий определит топ-100 участников сезона.</p>
+            <div class="season-final-footer"><b>Топ-100</b><span>получат особые привилегии и артефакты</span></div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <nav class="tabbar" aria-label="Основные разделы">
+      <div class="tabs">
+        <button class="tab active" data-tab="main"><img src="figma-assets/tab-main.svg" alt=""><span>Главный</span></button>
+        <button class="tab" data-tab="stores"><img src="figma-assets/tab-stores.svg" alt=""><span>Магазины</span></button>
+        <button class="tab" data-tab="payments"><img src="figma-assets/tab-payments.svg" alt=""><span>Платежи</span></button>
+        <button class="tab" data-tab="leagues"><img src="figma-assets/tab-leagues.svg" alt=""><span>Лиги</span></button>
+      </div>
+      <div class="home-indicator"></div>
+    </nav>
+
+    <section class="tasks-panel" id="tasks-panel" aria-hidden="true" aria-label="Задания на сегодня">
+      <header class="tasks-header">
+        <div class="tasks-nav"><button class="back-button" id="close-tasks" type="button" aria-label="Вернуться в Лиги">‹</button><h2 class="tasks-title">Задания на сегодня</h2></div>
+        <p class="tasks-summary" id="tasks-summary">Выбирай любые задания — баллы идут в личный результат и рейтинг Рубина.</p>
+      </header>
+      <div class="task-list">
+        <article class="task-card featured"><span class="task-icon">🧑‍🤝‍🧑</span><span class="task-copy"><strong>Привёл друга</strong><small>Друг зарегистрировался и начал пользоваться банком</small></span><span class="task-points">+300</span></article>
+        <article class="task-card"><span class="task-icon">💳</span><span class="task-copy"><strong>Сделал хотя бы 1 оплату вне Яндекса</strong><small>Любая покупка картой сегодня</small></span><span class="task-points">+10</span></article>
+        <article class="task-card"><span class="task-icon">❤️</span><span class="task-copy"><strong>Выбрал категории в селекторе</strong><small>Настроил категории выгоды на месяц</small></span><span class="task-points">+100</span></article>
+        <article class="task-card"><span class="task-icon">🎡</span><span class="task-copy"><strong>Покрутил колесо</strong><small>Забрал ежедневную награду</small></span><span class="task-points">+20</span></article>
+        <article class="task-card"><span class="task-icon">🔔</span><span class="task-copy"><strong>Включил уведомления о списаниях</strong><small>Чтобы сразу замечать каждую операцию</small></span><span class="task-points">+20</span></article>
+        <article class="task-card"><span class="task-icon">🔁</span><span class="task-copy"><strong>Проверил активные подписки</strong><small>Оставил только те, которыми пользуется</small></span><span class="task-points">+30</span></article>
+        <article class="task-card"><span class="task-icon">🎯</span><span class="task-copy"><strong>Создал сейв на цель</strong><small>Назвал цель и отложил первую сумму</small></span><span class="task-points">+40</span></article>
+        <article class="task-card"><span class="task-icon">🪙</span><span class="task-copy"><strong>Включил округление покупок в сейв</strong><small>Небольшие суммы копятся автоматически</small></span><span class="task-points">+30</span></article>
+        <article class="task-card"><span class="task-icon">📱</span><span class="task-copy"><strong>Добавил карту в бесконтактную оплату</strong><small>Подготовил телефон к оплате касанием</small></span><span class="task-points">+50</span></article>
+        <article class="task-card"><span class="task-icon">⚙️</span><span class="task-copy"><strong>Настроил автопополнение</strong><small>Выбрал комфортную сумму и порог баланса</small></span><span class="task-points">+50</span></article>
+      </div>
+    </section>
+
+    <section class="standings-panel" id="standings-panel" aria-hidden="true" aria-label="Турнирная таблица">
+      <header class="tasks-header">
+        <div class="tasks-nav"><button class="back-button" id="close-standings" type="button" aria-label="Вернуться в Лиги">‹</button><h2 class="tasks-title">Турнирная таблица</h2></div>
+      </header>
+      <div class="standings-switch" role="tablist" aria-label="Состав таблицы">
+        <button class="active" type="button" data-standings-mode="my" role="tab" aria-selected="true">Моя лига</button>
+        <button type="button" data-standings-mode="all" role="tab" aria-selected="false">Все лиги</button>
+      </div>
+      <div class="standings-context"><strong id="standings-title">Рубин</strong><span>2-й месяц из 3</span></div>
+      <div class="standing-head" aria-hidden="true"><span>№</span><span>Участник</span><span>Лига</span><span>Очки</span><span>Δ</span></div>
+      <div class="standing-list" id="standing-list"></div>
+      <p class="standings-note">Δ показывает разницу в очках с участником, который занимает место выше.</p>
+    </section>
+    <div class="toast" role="status"></div>
+  </main>
+
+  <script>
+    (() => {
+      const app = document.querySelector('#app');
+      const screen = app.querySelector('.screen');
+      const tabs = [...app.querySelectorAll('[data-tab]')];
+      const views = [...app.querySelectorAll('[data-view]')];
+      const toast = app.querySelector('.toast');
+      const tasksPanel = app.querySelector('#tasks-panel');
+      const standingsPanel = app.querySelector('#standings-panel');
+      const standingsTitle = app.querySelector('#standings-title');
+      const standingList = app.querySelector('#standing-list');
+      const standingsButtons = [...app.querySelectorAll('[data-standings-mode]')];
+      const onboardingSteps = [...app.querySelectorAll('[data-onboarding-step]')];
+      const nicknameForm = app.querySelector('#nickname-form');
+      const nicknameInput = app.querySelector('#nickname-input');
+      const nicknameSubmit = app.querySelector('#nickname-submit');
+      const gemChoices = app.querySelector('#gem-choices');
+      const facetsTitle = app.querySelector('#facets-title');
+      const finalGemUse = app.querySelector('#final-gem-use');
+      let timer;
+      let onboardingComplete = false;
+      let currentNickname = 'avkoroleva';
+      let currentLeagueGem = 'ruby';
+      const quizAnswers = {};
+
+      const gemMeta = {
+        ruby: { name:'Рубин', genitive:'Рубина', description:'Быстро включаешься, задаёшь темп и любишь видеть результат.', short:'Энергия и действие', place:'2 место', gap:'до первого — 27 240 баллов' },
+        sapphire: { name:'Сапфир', genitive:'Сапфира', description:'Сначала понимаешь систему, а затем действуешь спокойно и точно.', short:'Стратегия и спокойствие', place:'3 место', gap:'до второго — 24 320 баллов' },
+        emerald: { name:'Изумруд', genitive:'Изумруда', description:'Двигаешься последовательно и превращаешь небольшие шаги в устойчивый рост.', short:'Развитие и постоянство', place:'1 место', gap:'лидер сезона' },
+        diamond: { name:'Алмаз', genitive:'Алмаза', description:'Быстро находишь главное и выбираешь самый ясный путь к результату.', short:'Ясность и гибкость', place:'4 место', gap:'до третьего — 44 160 баллов' }
+      };
+      const gemOrder = ['ruby', 'sapphire', 'emerald', 'diamond'];
+
+      const standingsData = {
+        my: [
+          { rank:1, name:'north.star', team:'Рубин', gem:'ruby', points:'1 284', gap:'—' },
+          { rank:2, name:'avkoroleva', team:'Рубин', gem:'ruby', points:'1 146', gap:'−138', current:true },
+          { rank:3, name:'vera.v', team:'Рубин', gem:'ruby', points:'1 032', gap:'−114' },
+          { rank:4, name:'coinflip', team:'Рубин', gem:'ruby', points:'986', gap:'−46' },
+          { rank:5, name:'red_fox', team:'Рубин', gem:'ruby', points:'908', gap:'−78' },
+          { rank:6, name:'masha.m', team:'Рубин', gem:'ruby', points:'861', gap:'−47' },
+          { rank:7, name:'orbit', team:'Рубин', gem:'ruby', points:'802', gap:'−59' }
+        ],
+        all: [
+          { rank:1, name:'greenlight', team:'Изумруд', gem:'emerald', points:'1 418', gap:'—' },
+          { rank:2, name:'north.star', team:'Рубин', gem:'ruby', points:'1 284', gap:'−134' },
+          { rank:3, name:'bluebird', team:'Сапфир', gem:'sapphire', points:'1 239', gap:'−45' },
+          { rank:4, name:'crystal.cat', team:'Алмаз', gem:'diamond', points:'1 175', gap:'−64' },
+          { rank:5, name:'avkoroleva', team:'Рубин', gem:'ruby', points:'1 146', gap:'−29', current:true },
+          { rank:6, name:'mintfox', team:'Изумруд', gem:'emerald', points:'1 102', gap:'−44' },
+          { rank:7, name:'deepblue', team:'Сапфир', gem:'sapphire', points:'1 044', gap:'−58' }
+        ]
+      };
+
+      function gemIcon(gem) {
+        return `<i class="faculty-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><use href="#gem-${gem}-icon"/></svg></i>`;
+      }
+
+      function escapeHTML(value) {
+        return String(value).replace(/[&<>'"]/g, character => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' })[character]);
+      }
+
+      function renderStandings(mode) {
+        standingsTitle.textContent = mode === 'my' ? gemMeta[currentLeagueGem].name : 'Все лиги';
+        standingsButtons.forEach(button => {
+          const active = button.dataset.standingsMode === mode;
+          button.classList.toggle('active', active);
+          button.setAttribute('aria-selected', String(active));
+        });
+        standingList.innerHTML = standingsData[mode].map(player => `
+          <article class="standing-row ${player.rank <= 3 ? `podium-${player.rank}` : ''} ${player.current ? 'current-user' : ''}">
+            <span class="rank-badge">${player.rank}</span>
+            <span class="standing-name"><strong>${escapeHTML(player.name)}${player.current ? '<i class="you-mark">ты</i>' : ''}</strong><small>${player.rank <= 3 ? 'топ недели' : 'участник'}</small></span>
+            <span class="standing-team">${gemIcon(player.gem)}<small>${escapeHTML(player.team)}</small></span>
+            <span class="standing-points">${player.points}</span>
+            <span class="standing-gap">${player.gap}</span>
+          </article>`).join('');
+      }
+      renderStandings('my');
+
+      function showView(viewName) {
+        views.forEach(view => view.classList.toggle('active', view.dataset.view === viewName));
+        screen.scrollTop = 0;
+      }
+
+      function showOnboardingStep(stepName) {
+        onboardingSteps.forEach(step => step.classList.toggle('active', step.dataset.onboardingStep === stepName));
+        screen.scrollTop = 0;
+        if (stepName === 'nickname') setTimeout(() => nicknameInput.focus(), 0);
+      }
+
+      function renderFacetChoices() {
+        const scores = Object.fromEntries(gemOrder.map(gem => [gem, 0]));
+        Object.values(quizAnswers).forEach(gem => { scores[gem] += 1; });
+        const topGems = gemOrder
+          .map((gem, index) => ({ gem, score:scores[gem], index }))
+          .sort((first, second) => second.score - first.score || first.index - second.index)
+          .slice(0, 2)
+          .map(item => item.gem);
+        facetsTitle.textContent = `${currentNickname}, тебе близки ${gemMeta[topGems[0]].name} и ${gemMeta[topGems[1]].name}`;
+        gemChoices.innerHTML = topGems.map(gem => `
+          <button class="gem-choice" type="button" data-gem-choice="${gem}">
+            <svg viewBox="0 0 32 32" aria-hidden="true"><use href="#gem-${gem}-icon"/></svg>
+            <strong>${gemMeta[gem].name}</strong>
+            <small>${gemMeta[gem].short}</small>
+          </button>`).join('');
+      }
+
+      function applyChosenGem(gem) {
+        currentLeagueGem = gem;
+        const meta = gemMeta[gem];
+        app.querySelector('#current-league-hero').dataset.gem = gem;
+        app.querySelector('#hero-gem-use').setAttribute('href', `#gem-${gem}-icon`);
+        app.querySelector('#league-mark-use').setAttribute('href', `#gem-${gem}-icon`);
+        app.querySelector('#current-league-name').textContent = meta.name;
+        app.querySelector('#current-league-place').firstChild.textContent = meta.place;
+        app.querySelector('#current-league-gap').textContent = meta.gap;
+        app.querySelector('#tasks-summary').textContent = `Выбирай любые задания — баллы идут в личный результат и рейтинг ${meta.genitive}.`;
+        app.querySelectorAll('[data-league-gem]').forEach(row => {
+          const isCurrentLeague = row.dataset.leagueGem === gem;
+          row.classList.toggle('my-league', isCurrentLeague);
+          row.querySelector('.league-status').textContent = isCurrentLeague ? 'твой вклад · 1 146' : 'вклад участников';
+        });
+        standingsData.my.forEach(player => {
+          player.team = meta.name;
+          player.gem = gem;
+          if (player.current) player.name = currentNickname;
+        });
+        const currentAllPlayer = standingsData.all.find(player => player.current);
+        currentAllPlayer.name = currentNickname;
+        currentAllPlayer.team = meta.name;
+        currentAllPlayer.gem = gem;
+        finalGemUse.setAttribute('href', `#gem-${gem}-icon`);
+        app.querySelector('#final-title').textContent = `Ты в лиге ${meta.genitive}`;
+        app.querySelector('#final-description').textContent = meta.description;
+        renderStandings('my');
+      }
+
+      function fitDesktopPreview() {
+        if (window.innerWidth <= 440) {
+          app.style.transform = '';
+          app.style.transformOrigin = '';
+          return;
+        }
+        const scale = Math.min(1, (window.innerHeight - 48) / 812);
+        app.style.transform = `scale(${scale})`;
+        app.style.transformOrigin = 'top center';
+      }
+      fitDesktopPreview();
+      window.addEventListener('resize', fitDesktopPreview);
+
+      app.querySelectorAll('[data-onboarding-next]').forEach(button => button.addEventListener('click', () => {
+        showOnboardingStep(button.dataset.onboardingNext);
+      }));
+
+      app.querySelectorAll('[data-onboarding-back]').forEach(button => button.addEventListener('click', () => {
+        showOnboardingStep(button.dataset.onboardingBack);
+      }));
+
+      nicknameInput.addEventListener('input', () => {
+        nicknameSubmit.disabled = nicknameInput.value.trim().length === 0;
+      });
+
+      nicknameForm.addEventListener('submit', event => {
+        event.preventDefault();
+        const nickname = nicknameInput.value.trim();
+        if (!nickname) return;
+        currentNickname = nickname;
+        showOnboardingStep('free-time');
+      });
+
+      app.querySelectorAll('.quiz-option').forEach(button => button.addEventListener('click', () => {
+        const question = button.closest('[data-question]');
+        quizAnswers[question.dataset.question] = button.dataset.gem;
+        question.querySelectorAll('.quiz-option').forEach(option => option.classList.toggle('selected', option === button));
+        if (button.dataset.nextStep === 'facets') renderFacetChoices();
+        showOnboardingStep(button.dataset.nextStep);
+      }));
+
+      gemChoices.addEventListener('click', event => {
+        const choice = event.target.closest('[data-gem-choice]');
+        if (!choice) return;
+        applyChosenGem(choice.dataset.gemChoice);
+        showOnboardingStep('final');
+      });
+
+      app.querySelector('#enter-league').addEventListener('click', () => {
+        onboardingComplete = true;
+        tabs.forEach(item => item.classList.toggle('active', item.dataset.tab === 'leagues'));
+        showView('leagues');
+      });
+
+      tabs.forEach(tab => tab.addEventListener('click', () => {
+        tasksPanel.classList.remove('open');
+        tasksPanel.setAttribute('aria-hidden', 'true');
+        standingsPanel.classList.remove('open');
+        standingsPanel.setAttribute('aria-hidden', 'true');
+        tabs.forEach(item => item.classList.toggle('active', item === tab));
+        const targetView = tab.dataset.tab === 'leagues' && !onboardingComplete ? 'onboarding' : tab.dataset.tab;
+        showView(targetView);
+      }));
+
+      app.querySelector('.close').addEventListener('click', event => {
+        event.currentTarget.closest('.banner').style.display = 'none';
+      });
+
+      app.querySelector('#open-tasks').addEventListener('click', () => {
+        standingsPanel.classList.remove('open');
+        standingsPanel.setAttribute('aria-hidden', 'true');
+        tasksPanel.classList.add('open');
+        tasksPanel.setAttribute('aria-hidden', 'false');
+        tasksPanel.scrollTop = 0;
+      });
+
+      app.querySelector('#close-tasks').addEventListener('click', () => {
+        tasksPanel.classList.remove('open');
+        tasksPanel.setAttribute('aria-hidden', 'true');
+      });
+
+      app.querySelector('#open-standings').addEventListener('click', () => {
+        tasksPanel.classList.remove('open');
+        tasksPanel.setAttribute('aria-hidden', 'true');
+        standingsPanel.classList.add('open');
+        standingsPanel.setAttribute('aria-hidden', 'false');
+        standingsPanel.scrollTop = 0;
+      });
+
+      app.querySelector('#close-standings').addEventListener('click', () => {
+        standingsPanel.classList.remove('open');
+        standingsPanel.setAttribute('aria-hidden', 'true');
+      });
+
+      standingsButtons.forEach(button => button.addEventListener('click', () => renderStandings(button.dataset.standingsMode)));
+
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && tasksPanel.classList.contains('open')) {
+          tasksPanel.classList.remove('open');
+          tasksPanel.setAttribute('aria-hidden', 'true');
+        }
+        if (event.key === 'Escape' && standingsPanel.classList.contains('open')) {
+          standingsPanel.classList.remove('open');
+          standingsPanel.setAttribute('aria-hidden', 'true');
+        }
+      });
+
+      app.querySelectorAll('[data-toast]').forEach(button => button.addEventListener('click', () => {
+        clearTimeout(timer);
+        toast.textContent = button.dataset.toast;
+        toast.classList.add('show');
+        timer = setTimeout(() => toast.classList.remove('show'), 1900);
+      }));
+    })();
+  </script>
+</body>
+</html>
