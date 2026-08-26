@@ -342,18 +342,49 @@
     .tasks-title { margin:0; font-size:25px; line-height:30px; letter-spacing:-.7px; }
     .tasks-summary { margin:10px 0 0 48px; color:var(--secondary); font-size:12px; line-height:16px; }
     .task-list { display:flex; flex-direction:column; gap:8px; padding:0 20px 30px; }
-    .task-card { min-height:72px; display:flex; align-items:center; gap:12px; padding:13px 14px; border-radius:20px; background:var(--surface); }
+    .task-card { overflow:hidden; border-radius:20px; background:var(--surface); transition:box-shadow .18s ease, background .18s ease; }
+    .task-card-trigger { width:100%; min-height:76px; display:flex; align-items:center; gap:12px; padding:13px 14px; border:0; background:transparent; color:inherit; text-align:left; cursor:pointer; }
+    .task-card-trigger:focus-visible { outline:3px solid rgba(63,104,249,.28); outline-offset:-3px; }
     .task-icon { width:42px; height:42px; display:grid; place-items:center; flex:none; border-radius:13px; background:#fff; font-size:21px; }
     .task-copy { min-width:0; flex:1; }
     .task-copy strong { display:block; font-size:14px; line-height:17px; }
     .task-copy small { display:block; margin-top:3px; color:var(--secondary); font-size:11px; line-height:14px; }
     .task-points { flex:none; padding:6px 9px; border-radius:14px; background:#fff; font-size:12px; font-weight:600; white-space:nowrap; }
-    .task-card.featured { background:linear-gradient(135deg,#fff1f4,#edf2ff); }
-    .task-card.featured .task-points { background:var(--ink); color:#fff; }
+    .task-chevron { width:12px; flex:none; color:var(--secondary); font-size:21px; line-height:1; text-align:center; transition:transform .2s ease; }
+    .task-card.open .task-chevron { transform:rotate(90deg); }
+    .task-card.completed { background:linear-gradient(135deg,#fff1f4,#edf2ff); }
+    .task-card.completed .task-points { background:var(--ink); color:#fff; }
+    .task-card.completed .task-copy small { color:#83506b; }
+    .task-detail { display:grid; grid-template-rows:0fr; transition:grid-template-rows .22s ease; }
+    .task-card.open .task-detail { grid-template-rows:1fr; }
+    .task-detail-inner { overflow:hidden; }
+    .task-detail-content { margin:0 14px 14px 68px; padding-top:12px; border-top:1px solid rgba(0,0,0,.08); }
+    .task-detail-content strong { display:block; margin-bottom:5px; font-size:11px; }
+    .task-detail-content p { margin:0; color:var(--secondary); font-size:11px; line-height:16px; }
+    .task-detail-content p + strong { margin-top:11px; }
+    .task-choice-title { display:flex; align-items:baseline; justify-content:space-between; margin:13px 2px 2px; }
+    .task-choice-title strong { font-size:14px; }
+    .task-choice-title small { color:var(--secondary); font-size:10px; }
+    .task-or { display:flex; align-items:center; gap:9px; color:var(--secondary); font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.6px; }
+    .task-or::before, .task-or::after { content:""; height:1px; flex:1; background:#e5e7ea; }
+    .task-examples { margin-top:14px; border-radius:20px; background:#f7f7f8; color:var(--secondary); }
+    .task-examples summary { min-height:58px; display:flex; align-items:center; gap:10px; padding:0 14px; list-style:none; cursor:pointer; }
+    .task-examples summary::-webkit-details-marker { display:none; }
+    .task-examples summary strong { flex:1; color:#62666b; font-size:13px; }
+    .task-examples summary small { font-size:10px; }
+    .task-examples summary .task-chevron { transition:transform .2s ease; }
+    .task-examples[open] summary .task-chevron { transform:rotate(90deg); }
+    .task-example-list { display:flex; flex-direction:column; gap:0; padding:0 14px 12px; }
+    .task-example { min-height:46px; display:grid; grid-template-columns:28px 1fr auto; gap:9px; align-items:center; border-top:1px solid #e8e9eb; font-size:11px; }
+    .task-example i { font-style:normal; font-size:16px; }
+    .task-example span:last-child { font-weight:600; }
 
-    .standings-switch { display:grid; grid-template-columns:1fr 1fr; gap:3px; margin:0 20px 14px; padding:3px; border-radius:16px; background:var(--surface); }
-    .standings-switch button { height:38px; border:0; border-radius:13px; background:transparent; color:var(--secondary); font-size:13px; font-weight:600; cursor:pointer; }
-    .standings-switch button.active { background:#fff; color:var(--ink); box-shadow:0 2px 10px rgba(0,0,0,.07); }
+    .standings-period, .standings-switch { display:grid; gap:3px; margin:0 20px; padding:3px; border-radius:16px; background:var(--surface); }
+    .standings-period { grid-template-columns:repeat(3,1fr); margin-bottom:8px; }
+    .standings-switch { grid-template-columns:1fr 1fr; margin-bottom:14px; }
+    .standings-period button, .standings-switch button { height:38px; border:0; border-radius:13px; background:transparent; color:var(--secondary); font-size:13px; font-weight:600; cursor:pointer; }
+    .standings-period button.active, .standings-switch button.active { background:#fff; color:var(--ink); box-shadow:0 2px 10px rgba(0,0,0,.07); }
+    .standings-period button:focus-visible, .standings-switch button:focus-visible { outline:3px solid rgba(63,104,249,.28); outline-offset:2px; }
     .standings-context { display:flex; align-items:center; justify-content:space-between; margin:0 20px 14px; }
     .standings-context strong { font-size:15px; }
     .standings-context span { color:var(--secondary); font-size:11px; }
@@ -363,9 +394,10 @@
     .standing-list { display:flex; flex-direction:column; gap:7px; padding:0 20px 30px; }
     .standing-row { position:relative; min-height:67px; padding:10px 8px; overflow:hidden; border-radius:18px; background:var(--surface); }
     .standing-row.podium-1 { min-height:76px; background:#171717; color:#fff; }
-    .standing-row.podium-2 { background:linear-gradient(110deg,#f8f9fa,#e8ebef); }
-    .standing-row.podium-3 { background:linear-gradient(110deg,#f8f5f2,#eadfd7); }
-    .standing-row.current-user::after { content:""; position:absolute; inset:0; border:2px solid #eb469f; border-radius:18px; pointer-events:none; }
+    .standing-row.podium-2 { background:#eef0f3; }
+    .standing-row.podium-3 { background:#f2ece8; }
+    .standing-row.current-user:not(.podium-1) { background:#fff7fb; }
+    .standing-row.current-user::after { content:""; position:absolute; inset:0; border:1.5px solid #df76ad; border-radius:18px; pointer-events:none; }
     .rank-badge { width:27px; height:32px; display:grid; place-items:center; border-radius:8px; background:#fff; color:var(--ink); font-size:14px; font-weight:700; }
     .podium-1 .rank-badge { background:#fff; }
     .podium-2 .rank-badge { background:#d8dce2; }
@@ -374,7 +406,6 @@
     .standing-name strong { display:block; overflow:hidden; font-size:13px; line-height:16px; text-overflow:ellipsis; white-space:nowrap; }
     .standing-name small { display:block; margin-top:3px; color:var(--secondary); font-size:9px; }
     .podium-1 .standing-name small, .podium-1 .standing-team small { color:rgba(255,255,255,.58); }
-    .you-mark { display:inline-block; margin-left:4px; padding:2px 5px; border-radius:7px; background:linear-gradient(90deg,#eb469f,#8341ef); color:#fff; font-size:8px; vertical-align:1px; }
     .standing-team { min-width:0; display:flex; align-items:center; gap:5px; }
     .faculty-mark { width:25px; height:25px; display:grid; place-items:center; flex:none; }
     .faculty-mark svg { width:23px; height:23px; overflow:visible; filter:drop-shadow(0 2px 3px rgba(0,0,0,.13)); }
@@ -414,9 +445,12 @@
     .nickname-input { width:100%; height:58px; padding:0 17px; border:1.5px solid #dfe2e6; border-radius:18px; background:#fff; font-size:18px; outline:none; }
     .nickname-input:focus { border-color:var(--ink); box-shadow:0 0 0 3px rgba(0,0,0,.05); }
     .nickname-caption { display:block; margin:8px 3px 0; color:var(--secondary); font-size:11px; line-height:15px; }
+    .nickname-generate { min-height:40px; margin:10px 0 0; padding:0 13px; border:0; border-radius:14px; background:var(--surface); color:var(--ink); font-size:12px; font-weight:600; cursor:pointer; }
+    .nickname-generate:active { transform:scale(.98); }
+    .nickname-generate:focus-visible { outline:3px solid rgba(63,104,249,.28); outline-offset:2px; }
     .quiz-options { display:flex; flex-direction:column; gap:8px; }
     .quiz-option { width:100%; min-height:58px; display:flex; align-items:center; gap:11px; padding:12px 14px; border:0; border-radius:18px; background:var(--surface); text-align:left; font-size:13px; line-height:17px; cursor:pointer; }
-    .quiz-option i { width:30px; height:30px; display:grid; place-items:center; flex:none; border-radius:10px; background:#fff; font-style:normal; font-size:15px; }
+    .quiz-option i { width:34px; height:34px; display:grid; place-items:center; flex:none; border-radius:11px; background:#fff; font-style:normal; font-size:18px; line-height:1; }
     .quiz-option.selected { box-shadow:inset 0 0 0 2px var(--ink); }
     .result-head { text-align:center; }
     .result-head .onboarding-title, .result-head .onboarding-copy { margin-right:auto; margin-left:auto; }
@@ -598,11 +632,11 @@
         <div class="onboarding" id="onboarding-flow">
           <section class="onboarding-step active" data-onboarding-step="welcome">
             <p class="onboarding-kicker">Новый сезон</p>
-            <h1 class="onboarding-title">Поучаствовать в сезоне</h1>
-            <p class="onboarding-copy">Сезон длится три месяца. Вступить можно в первые два — общий срок от этого не изменится.</p>
+            <h1 class="onboarding-title">Поучаствовать в лиге</h1>
+            <p class="onboarding-copy">Сезон длится три месяца. Вступить можно в первые два в любой момент — общий срок от этого не изменится.</p>
             <div class="karat-hero" aria-hidden="true"><svg viewBox="0 0 48 48"><use href="#tasks-chest-icon"/></svg></div>
             <span class="karat-name">Карат</span>
-            <div class="onboarding-actions"><button class="onboarding-primary" type="button" data-onboarding-next="intro">Поучаствовать</button></div>
+            <div class="onboarding-actions"><button class="onboarding-primary" type="button" data-onboarding-next="intro">Вступить в Лигу</button></div>
           </section>
 
           <section class="onboarding-step" data-onboarding-step="intro">
@@ -610,7 +644,7 @@
             <span class="karat-name">Карат</span>
             <div class="intro-message">
               <h1 class="onboarding-title">Перед тем, как принять участие, давай познакомимся?</h1>
-              <p class="onboarding-copy">Я задам несколько вопросов, чтобы увидеть твои грани и найти подходящие камни.</p>
+              <p class="onboarding-copy">Я задам несколько вопросов, чтобы увидеть твои грани и найти подходящую лигу.</p>
             </div>
             <div class="onboarding-actions"><button class="onboarding-primary" type="button" data-onboarding-next="nickname">Давай</button></div>
           </section>
@@ -622,6 +656,7 @@
             <form id="nickname-form">
               <input class="nickname-input" id="nickname-input" name="nickname" maxlength="20" autocomplete="off" placeholder="Например, Аня" aria-describedby="nickname-caption">
               <small class="nickname-caption" id="nickname-caption">Это будет твоим ником в турнирной таблице.</small>
+              <button class="nickname-generate" id="generate-nickname" type="button">Сгенерировать ник</button>
               <div class="onboarding-actions"><button class="onboarding-primary" id="nickname-submit" type="submit" disabled>Продолжить</button></div>
             </form>
           </section>
@@ -631,10 +666,10 @@
             <h2 class="quiz-question">Появилось свободных 15 минут. Что выберешь?</h2>
             <p class="quiz-hint">Здесь нет правильных ответов — выбирай то, что ближе.</p>
             <div class="quiz-options" data-question="free-time">
-              <button class="quiz-option" type="button" data-gem="ruby" data-next-step="team-role"><i>↗</i><span>Сделаю одно полезное дело прямо сейчас</span></button>
-              <button class="quiz-option" type="button" data-gem="sapphire" data-next-step="team-role"><i>⌁</i><span>Сначала посмотрю, что даст больше результата</span></button>
-              <button class="quiz-option" type="button" data-gem="emerald" data-next-step="team-role"><i>＋</i><span>Продолжу то, что уже начал</span></button>
-              <button class="quiz-option" type="button" data-gem="diamond" data-next-step="team-role"><i>◇</i><span>Разберусь и выберу самый короткий путь</span></button>
+              <button class="quiz-option" type="button" data-gem="ruby" data-next-step="team-role"><i aria-hidden="true">✅</i><span>Сделаю одно полезное дело прямо сейчас</span></button>
+              <button class="quiz-option" type="button" data-gem="sapphire" data-next-step="team-role"><i aria-hidden="true">🧭</i><span>Сначала посмотрю, что даст больше результата</span></button>
+              <button class="quiz-option" type="button" data-gem="emerald" data-next-step="team-role"><i aria-hidden="true">🔄</i><span>Продолжу то, что уже начал</span></button>
+              <button class="quiz-option" type="button" data-gem="diamond" data-next-step="team-role"><i aria-hidden="true">💡</i><span>Разберусь и выберу самый короткий путь</span></button>
             </div>
           </section>
 
@@ -643,10 +678,10 @@
             <h2 class="quiz-question">В командном челлендже ты чаще…</h2>
             <p class="quiz-hint">Выбери роль, которую обычно берёшь на себя.</p>
             <div class="quiz-options" data-question="team-role">
-              <button class="quiz-option" type="button" data-gem="ruby" data-next-step="result-style"><i>⚡</i><span>Задаю темп и начинаю первым</span></button>
-              <button class="quiz-option" type="button" data-gem="sapphire" data-next-step="result-style"><i>≡</i><span>Предлагаю план и распределяю шаги</span></button>
-              <button class="quiz-option" type="button" data-gem="emerald" data-next-step="result-style"><i>∞</i><span>Поддерживаю ритм, чтобы никто не выпал</span></button>
-              <button class="quiz-option" type="button" data-gem="diamond" data-next-step="result-style"><i>✦</i><span>Нахожу простой способ дойти до цели</span></button>
+              <button class="quiz-option" type="button" data-gem="ruby" data-next-step="result-style"><i aria-hidden="true">⚡️</i><span>Задаю темп и начинаю первым</span></button>
+              <button class="quiz-option" type="button" data-gem="sapphire" data-next-step="result-style"><i aria-hidden="true">🗺️</i><span>Предлагаю план и распределяю шаги</span></button>
+              <button class="quiz-option" type="button" data-gem="emerald" data-next-step="result-style"><i aria-hidden="true">🤝</i><span>Поддерживаю ритм, чтобы никто не выпал</span></button>
+              <button class="quiz-option" type="button" data-gem="diamond" data-next-step="result-style"><i aria-hidden="true">✨</i><span>Нахожу простой способ дойти до цели</span></button>
             </div>
           </section>
 
@@ -655,10 +690,10 @@
             <h2 class="quiz-question">Как приятнее получать результат?</h2>
             <p class="quiz-hint">Последний вопрос — и Карат покажет твои грани.</p>
             <div class="quiz-options" data-question="result-style">
-              <button class="quiz-option" type="button" data-gem="ruby" data-next-step="facets"><i>●</i><span>Ярким рывком и с заметным эффектом</span></button>
-              <button class="quiz-option" type="button" data-gem="sapphire" data-next-step="facets"><i>◫</i><span>По продуманной стратегии</span></button>
-              <button class="quiz-option" type="button" data-gem="emerald" data-next-step="facets"><i>◌</i><span>Понемногу каждый день</span></button>
-              <button class="quiz-option" type="button" data-gem="diamond" data-next-step="facets"><i>◆</i><span>За счёт одного точного решения</span></button>
+              <button class="quiz-option" type="button" data-gem="ruby" data-next-step="facets"><i aria-hidden="true">🚀</i><span>Ярким рывком и с заметным эффектом</span></button>
+              <button class="quiz-option" type="button" data-gem="sapphire" data-next-step="facets"><i aria-hidden="true">♟️</i><span>По продуманной стратегии</span></button>
+              <button class="quiz-option" type="button" data-gem="emerald" data-next-step="facets"><i aria-hidden="true">🌱</i><span>Понемногу каждый день</span></button>
+              <button class="quiz-option" type="button" data-gem="diamond" data-next-step="facets"><i aria-hidden="true">🎯</i><span>За счёт одного точного решения</span></button>
             </div>
           </section>
 
@@ -694,7 +729,7 @@
             <div class="league-foot"><span>Твой вклад в сезон<b>1 146</b></span><button type="button" id="open-standings">Таблица →</button></div>
           </section>
 
-          <button class="daily" id="open-tasks" type="button"><span class="daily-icon tasks-logo" aria-hidden="true"><svg viewBox="0 0 48 48"><use href="#tasks-chest-icon"/></svg></span><span class="daily-copy"><strong>Задания на сегодня</strong><small>10 быстрых действий · обновятся завтра</small></span><span class="chevron">›</span></button>
+          <button class="daily" id="open-tasks" type="button"><span class="daily-icon tasks-logo" aria-hidden="true"><svg viewBox="0 0 48 48"><use href="#tasks-chest-icon"/></svg></span><span class="daily-copy"><strong>Задания на сегодня</strong><small>3 задания · одно ежедневное</small></span><span class="chevron">›</span></button>
 
           <section class="streak">
             <div class="streak-head"><span>🔥 Серия: 5 дней</span><span class="multiplier">ещё 2 до ×1,25</span></div>
@@ -746,19 +781,55 @@
     <section class="tasks-panel" id="tasks-panel" aria-hidden="true" aria-label="Задания на сегодня">
       <header class="tasks-header">
         <div class="tasks-nav"><button class="back-button" id="close-tasks" type="button" aria-label="Вернуться в Лиги">‹</button><h2 class="tasks-title">Задания на сегодня</h2></div>
-        <p class="tasks-summary" id="tasks-summary">Выбирай любые задания — баллы идут в личный результат и рейтинг Рубина.</p>
+        <p class="tasks-summary" id="tasks-summary">Оплата — ежедневное задание, которое идёт в страйк. Баллы идут в личный рейтинг и в рейтинг Рубина.</p>
       </header>
       <div class="task-list">
-        <article class="task-card featured"><span class="task-icon">🧑‍🤝‍🧑</span><span class="task-copy"><strong>Привёл друга</strong><small>Друг зарегистрировался и начал пользоваться банком</small></span><span class="task-points">+300</span></article>
-        <article class="task-card"><span class="task-icon">💳</span><span class="task-copy"><strong>Сделал хотя бы 1 оплату вне Яндекса</strong><small>Любая покупка картой сегодня</small></span><span class="task-points">+10</span></article>
-        <article class="task-card"><span class="task-icon">❤️</span><span class="task-copy"><strong>Выбрал категории в селекторе</strong><small>Настроил категории выгоды на месяц</small></span><span class="task-points">+100</span></article>
-        <article class="task-card"><span class="task-icon">🎡</span><span class="task-copy"><strong>Покрутил колесо</strong><small>Забрал ежедневную награду</small></span><span class="task-points">+20</span></article>
-        <article class="task-card"><span class="task-icon">🔔</span><span class="task-copy"><strong>Включил уведомления о списаниях</strong><small>Чтобы сразу замечать каждую операцию</small></span><span class="task-points">+20</span></article>
-        <article class="task-card"><span class="task-icon">🔁</span><span class="task-copy"><strong>Проверил активные подписки</strong><small>Оставил только те, которыми пользуется</small></span><span class="task-points">+30</span></article>
-        <article class="task-card"><span class="task-icon">🎯</span><span class="task-copy"><strong>Создал сейв на цель</strong><small>Назвал цель и отложил первую сумму</small></span><span class="task-points">+40</span></article>
-        <article class="task-card"><span class="task-icon">🪙</span><span class="task-copy"><strong>Включил округление покупок в сейв</strong><small>Небольшие суммы копятся автоматически</small></span><span class="task-points">+30</span></article>
-        <article class="task-card"><span class="task-icon">📱</span><span class="task-copy"><strong>Добавил карту в бесконтактную оплату</strong><small>Подготовил телефон к оплате касанием</small></span><span class="task-points">+50</span></article>
-        <article class="task-card"><span class="task-icon">⚙️</span><span class="task-copy"><strong>Настроил автопополнение</strong><small>Выбрал комфортную сумму и порог баланса</small></span><span class="task-points">+50</span></article>
+        <article class="task-card completed" data-task-card>
+          <button class="task-card-trigger" type="button" aria-expanded="false">
+            <span class="task-icon">💳</span><span class="task-copy"><strong>Сделал хотя бы 1 оплату вне Яндекса</strong><small>Выполнено сегодня · страйк 3 из 5</small></span><span class="task-points">+10</span><span class="task-chevron">›</span>
+          </button>
+          <div class="task-detail"><div class="task-detail-inner"><div class="task-detail-content">
+            <strong>Как работает</strong><p>Это ежедневное задание. Первая подходящая оплата за день продолжает недельный страйк и приносит 10 баллов.</p>
+            <strong>Как выполнить</strong><p>Оплатите любую покупку вне сервисов Яндекса картой Пэй — пластиковой картой или стикером, по BLE или NFC либо с помощью QR-оплаты.</p>
+          </div></div></div>
+        </article>
+
+        <div class="task-choice-title"><strong>Выбери одно из двух</strong><small>одно задание на сегодня</small></div>
+
+        <article class="task-card" data-task-card>
+          <button class="task-card-trigger" type="button" aria-expanded="false">
+            <span class="task-icon">🧑‍🤝‍🧑</span><span class="task-copy"><strong>Привёл друга</strong><small>Засчитаем после его первого задания</small></span><span class="task-points">+300</span><span class="task-chevron">›</span>
+          </button>
+          <div class="task-detail"><div class="task-detail-inner"><div class="task-detail-content">
+            <strong>Как работает</strong><p>Задание засчитается, когда друг зарегистрируется в банке и выполнит своё первое задание.</p>
+            <strong>Где найти</strong><p>На главном экране откройте раздел «Привести друга», нажмите на любой продукт, скопируйте ссылку и отправьте её другу.</p>
+          </div></div></div>
+        </article>
+
+        <div class="task-or">или</div>
+
+        <article class="task-card" data-task-card>
+          <button class="task-card-trigger" type="button" aria-expanded="false">
+            <span class="task-icon">❤️</span><span class="task-copy"><strong>Выбрал категории в селекторе</strong><small>Категории выгоды текущего месяца</small></span><span class="task-points">+100</span><span class="task-chevron">›</span>
+          </button>
+          <div class="task-detail"><div class="task-detail-inner"><div class="task-detail-content">
+            <strong>Как работает</strong><p>Выберите доступные категории выгоды на текущий месяц и сохраните свой выбор.</p>
+            <strong>Где найти</strong><p>На главном экране Пэй зайдите в «Бонусы текущего месяца», выберите понравившиеся категории и нажмите «Сохранить».</p>
+          </div></div></div>
+        </article>
+
+        <details class="task-examples">
+          <summary><span aria-hidden="true">💭</span><strong>Примеры заданий</strong><small>ещё 7 идей</small><span class="task-chevron">›</span></summary>
+          <div class="task-example-list">
+            <div class="task-example"><i>🎡</i><span>Покрутить колесо</span><span>+20</span></div>
+            <div class="task-example"><i>🔔</i><span>Включить уведомления о списаниях</span><span>+20</span></div>
+            <div class="task-example"><i>🔁</i><span>Проверить активные подписки</span><span>+30</span></div>
+            <div class="task-example"><i>🎯</i><span>Создать сейв на цель</span><span>+40</span></div>
+            <div class="task-example"><i>🪙</i><span>Включить округление покупок</span><span>+30</span></div>
+            <div class="task-example"><i>📱</i><span>Добавить карту в бесконтактную оплату</span><span>+50</span></div>
+            <div class="task-example"><i>⚙️</i><span>Настроить автопополнение</span><span>+50</span></div>
+          </div>
+        </details>
       </div>
     </section>
 
@@ -766,11 +837,16 @@
       <header class="tasks-header">
         <div class="tasks-nav"><button class="back-button" id="close-standings" type="button" aria-label="Вернуться в Лиги">‹</button><h2 class="tasks-title">Турнирная таблица</h2></div>
       </header>
+      <div class="standings-period" role="tablist" aria-label="Период турнира">
+        <button class="active" type="button" data-standings-period="today" role="tab" aria-selected="true">Сегодня</button>
+        <button type="button" data-standings-period="week" role="tab" aria-selected="false">Неделя</button>
+        <button type="button" data-standings-period="month" role="tab" aria-selected="false">Месяц</button>
+      </div>
       <div class="standings-switch" role="tablist" aria-label="Состав таблицы">
         <button class="active" type="button" data-standings-mode="my" role="tab" aria-selected="true">Моя лига</button>
         <button type="button" data-standings-mode="all" role="tab" aria-selected="false">Все лиги</button>
       </div>
-      <div class="standings-context"><strong id="standings-title">Рубин</strong><span>2-й месяц из 3</span></div>
+      <div class="standings-context"><strong id="standings-title">Рубин</strong><span id="standings-period-caption">Сегодня · до 23:59</span></div>
       <div class="standing-head" aria-hidden="true"><span>№</span><span>Участник</span><span>Лига</span><span>Очки</span><span>Δ</span></div>
       <div class="standing-list" id="standing-list"></div>
       <p class="standings-note">Δ показывает разницу в очках с участником, который занимает место выше.</p>
@@ -788,12 +864,15 @@
       const tasksPanel = app.querySelector('#tasks-panel');
       const standingsPanel = app.querySelector('#standings-panel');
       const standingsTitle = app.querySelector('#standings-title');
+      const standingsPeriodCaption = app.querySelector('#standings-period-caption');
       const standingList = app.querySelector('#standing-list');
       const standingsButtons = [...app.querySelectorAll('[data-standings-mode]')];
+      const standingsPeriodButtons = [...app.querySelectorAll('[data-standings-period]')];
       const onboardingSteps = [...app.querySelectorAll('[data-onboarding-step]')];
       const nicknameForm = app.querySelector('#nickname-form');
       const nicknameInput = app.querySelector('#nickname-input');
       const nicknameSubmit = app.querySelector('#nickname-submit');
+      const generateNickname = app.querySelector('#generate-nickname');
       const gemChoices = app.querySelector('#gem-choices');
       const facetsTitle = app.querySelector('#facets-title');
       const finalGemUse = app.querySelector('#final-gem-use');
@@ -801,6 +880,8 @@
       let onboardingComplete = false;
       let currentNickname = 'avkoroleva';
       let currentLeagueGem = 'ruby';
+      let activeStandingsMode = 'my';
+      let activeStandingsPeriod = 'today';
       const quizAnswers = {};
 
       const gemMeta = {
@@ -810,26 +891,76 @@
         diamond: { name:'Алмаз', genitive:'Алмаза', description:'Быстро находишь главное и выбираешь самый ясный путь к результату.', short:'Ясность и гибкость', place:'4 место', gap:'до третьего — 44 160 баллов' }
       };
       const gemOrder = ['ruby', 'sapphire', 'emerald', 'diamond'];
+      const generatedNicknames = ['north.star', 'mint.cloud', 'quiet.wave', 'bright.comet', 'lucky.panda', 'night.owl', 'paper.plane', 'wild.berry', 'fast.turtle', 'soft.power', 'sunny.side', 'tiny.rocket'];
+      let lastGeneratedNickname = '';
+
+      const standingsPeriodMeta = {
+        today: { caption:'Сегодня · до 23:59', leaderLabel:'топ сегодня', memberLabel:'турнир сегодня' },
+        week: { caption:'Неделя · ещё 4 дня', leaderLabel:'топ недели', memberLabel:'участник недели' },
+        month: { caption:'Август · ещё 7 дней', leaderLabel:'топ месяца', memberLabel:'участник месяца' }
+      };
 
       const standingsData = {
-        my: [
-          { rank:1, name:'north.star', team:'Рубин', gem:'ruby', points:'1 284', gap:'—' },
-          { rank:2, name:'avkoroleva', team:'Рубин', gem:'ruby', points:'1 146', gap:'−138', current:true },
-          { rank:3, name:'vera.v', team:'Рубин', gem:'ruby', points:'1 032', gap:'−114' },
-          { rank:4, name:'coinflip', team:'Рубин', gem:'ruby', points:'986', gap:'−46' },
-          { rank:5, name:'red_fox', team:'Рубин', gem:'ruby', points:'908', gap:'−78' },
-          { rank:6, name:'masha.m', team:'Рубин', gem:'ruby', points:'861', gap:'−47' },
-          { rank:7, name:'orbit', team:'Рубин', gem:'ruby', points:'802', gap:'−59' }
-        ],
-        all: [
-          { rank:1, name:'greenlight', team:'Изумруд', gem:'emerald', points:'1 418', gap:'—' },
-          { rank:2, name:'north.star', team:'Рубин', gem:'ruby', points:'1 284', gap:'−134' },
-          { rank:3, name:'bluebird', team:'Сапфир', gem:'sapphire', points:'1 239', gap:'−45' },
-          { rank:4, name:'crystal.cat', team:'Алмаз', gem:'diamond', points:'1 175', gap:'−64' },
-          { rank:5, name:'avkoroleva', team:'Рубин', gem:'ruby', points:'1 146', gap:'−29', current:true },
-          { rank:6, name:'mintfox', team:'Изумруд', gem:'emerald', points:'1 102', gap:'−44' },
-          { rank:7, name:'deepblue', team:'Сапфир', gem:'sapphire', points:'1 044', gap:'−58' }
-        ]
+        today: {
+          my: [
+            { rank:1, name:'north.star', team:'Рубин', gem:'ruby', points:'280', gap:'—' },
+            { rank:2, name:'vera.v', team:'Рубин', gem:'ruby', points:'250', gap:'−30' },
+            { rank:3, name:'avkoroleva', team:'Рубин', gem:'ruby', points:'210', gap:'−40', current:true },
+            { rank:4, name:'coinflip', team:'Рубин', gem:'ruby', points:'180', gap:'−30' },
+            { rank:5, name:'red_fox', team:'Рубин', gem:'ruby', points:'160', gap:'−20' },
+            { rank:6, name:'masha.m', team:'Рубин', gem:'ruby', points:'140', gap:'−20' },
+            { rank:7, name:'orbit', team:'Рубин', gem:'ruby', points:'120', gap:'−20' }
+          ],
+          all: [
+            { rank:1, name:'greenlight', team:'Изумруд', gem:'emerald', points:'340', gap:'—' },
+            { rank:2, name:'bluebird', team:'Сапфир', gem:'sapphire', points:'310', gap:'−30' },
+            { rank:3, name:'north.star', team:'Рубин', gem:'ruby', points:'280', gap:'−30' },
+            { rank:4, name:'crystal.cat', team:'Алмаз', gem:'diamond', points:'260', gap:'−20' },
+            { rank:5, name:'vera.v', team:'Рубин', gem:'ruby', points:'250', gap:'−10' },
+            { rank:6, name:'deepblue', team:'Сапфир', gem:'sapphire', points:'230', gap:'−20' },
+            { rank:7, name:'avkoroleva', team:'Рубин', gem:'ruby', points:'210', gap:'−20', current:true }
+          ]
+        },
+        week: {
+          my: [
+            { rank:1, name:'north.star', team:'Рубин', gem:'ruby', points:'1 284', gap:'—' },
+            { rank:2, name:'avkoroleva', team:'Рубин', gem:'ruby', points:'1 146', gap:'−138', current:true },
+            { rank:3, name:'vera.v', team:'Рубин', gem:'ruby', points:'1 032', gap:'−114' },
+            { rank:4, name:'coinflip', team:'Рубин', gem:'ruby', points:'986', gap:'−46' },
+            { rank:5, name:'red_fox', team:'Рубин', gem:'ruby', points:'908', gap:'−78' },
+            { rank:6, name:'masha.m', team:'Рубин', gem:'ruby', points:'861', gap:'−47' },
+            { rank:7, name:'orbit', team:'Рубин', gem:'ruby', points:'802', gap:'−59' }
+          ],
+          all: [
+            { rank:1, name:'greenlight', team:'Изумруд', gem:'emerald', points:'1 418', gap:'—' },
+            { rank:2, name:'north.star', team:'Рубин', gem:'ruby', points:'1 284', gap:'−134' },
+            { rank:3, name:'bluebird', team:'Сапфир', gem:'sapphire', points:'1 239', gap:'−45' },
+            { rank:4, name:'crystal.cat', team:'Алмаз', gem:'diamond', points:'1 175', gap:'−64' },
+            { rank:5, name:'avkoroleva', team:'Рубин', gem:'ruby', points:'1 146', gap:'−29', current:true },
+            { rank:6, name:'mintfox', team:'Изумруд', gem:'emerald', points:'1 102', gap:'−44' },
+            { rank:7, name:'deepblue', team:'Сапфир', gem:'sapphire', points:'1 044', gap:'−58' }
+          ]
+        },
+        month: {
+          my: [
+            { rank:1, name:'north.star', team:'Рубин', gem:'ruby', points:'5 640', gap:'—' },
+            { rank:2, name:'vera.v', team:'Рубин', gem:'ruby', points:'5 220', gap:'−420' },
+            { rank:3, name:'coinflip', team:'Рубин', gem:'ruby', points:'4 980', gap:'−240' },
+            { rank:4, name:'avkoroleva', team:'Рубин', gem:'ruby', points:'4 860', gap:'−120', current:true },
+            { rank:5, name:'masha.m', team:'Рубин', gem:'ruby', points:'4 610', gap:'−250' },
+            { rank:6, name:'red_fox', team:'Рубин', gem:'ruby', points:'4 380', gap:'−230' },
+            { rank:7, name:'orbit', team:'Рубин', gem:'ruby', points:'4 120', gap:'−260' }
+          ],
+          all: [
+            { rank:1, name:'greenlight', team:'Изумруд', gem:'emerald', points:'6 420', gap:'—' },
+            { rank:2, name:'bluebird', team:'Сапфир', gem:'sapphire', points:'6 180', gap:'−240' },
+            { rank:3, name:'north.star', team:'Рубин', gem:'ruby', points:'5 640', gap:'−540' },
+            { rank:4, name:'mintfox', team:'Изумруд', gem:'emerald', points:'5 430', gap:'−210' },
+            { rank:5, name:'vera.v', team:'Рубин', gem:'ruby', points:'5 220', gap:'−210' },
+            { rank:6, name:'crystal.cat', team:'Алмаз', gem:'diamond', points:'5 050', gap:'−170' },
+            { rank:7, name:'avkoroleva', team:'Рубин', gem:'ruby', points:'4 860', gap:'−190', current:true }
+          ]
+        }
       };
 
       function gemIcon(gem) {
@@ -840,23 +971,32 @@
         return String(value).replace(/[&<>'"]/g, character => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' })[character]);
       }
 
-      function renderStandings(mode) {
+      function renderStandings(period = activeStandingsPeriod, mode = activeStandingsMode) {
+        activeStandingsPeriod = period;
+        activeStandingsMode = mode;
+        const periodMeta = standingsPeriodMeta[period];
         standingsTitle.textContent = mode === 'my' ? gemMeta[currentLeagueGem].name : 'Все лиги';
+        standingsPeriodCaption.textContent = periodMeta.caption;
+        standingsPeriodButtons.forEach(button => {
+          const active = button.dataset.standingsPeriod === period;
+          button.classList.toggle('active', active);
+          button.setAttribute('aria-selected', String(active));
+        });
         standingsButtons.forEach(button => {
           const active = button.dataset.standingsMode === mode;
           button.classList.toggle('active', active);
           button.setAttribute('aria-selected', String(active));
         });
-        standingList.innerHTML = standingsData[mode].map(player => `
+        standingList.innerHTML = standingsData[period][mode].map(player => `
           <article class="standing-row ${player.rank <= 3 ? `podium-${player.rank}` : ''} ${player.current ? 'current-user' : ''}">
             <span class="rank-badge">${player.rank}</span>
-            <span class="standing-name"><strong>${escapeHTML(player.name)}${player.current ? '<i class="you-mark">ты</i>' : ''}</strong><small>${player.rank <= 3 ? 'топ недели' : 'участник'}</small></span>
+            <span class="standing-name"><strong>${escapeHTML(player.name)}</strong><small>${player.rank <= 3 ? periodMeta.leaderLabel : periodMeta.memberLabel}</small></span>
             <span class="standing-team">${gemIcon(player.gem)}<small>${escapeHTML(player.team)}</small></span>
             <span class="standing-points">${player.points}</span>
             <span class="standing-gap">${player.gap}</span>
           </article>`).join('');
       }
-      renderStandings('my');
+      renderStandings();
 
       function showView(viewName) {
         views.forEach(view => view.classList.toggle('active', view.dataset.view === viewName));
@@ -895,25 +1035,27 @@
         app.querySelector('#current-league-name').textContent = meta.name;
         app.querySelector('#current-league-place').firstChild.textContent = meta.place;
         app.querySelector('#current-league-gap').textContent = meta.gap;
-        app.querySelector('#tasks-summary').textContent = `Выбирай любые задания — баллы идут в личный результат и рейтинг ${meta.genitive}.`;
+        app.querySelector('#tasks-summary').textContent = `Оплата — ежедневное задание, которое идёт в страйк. Баллы идут в личный рейтинг и в рейтинг ${meta.genitive}.`;
         app.querySelectorAll('[data-league-gem]').forEach(row => {
           const isCurrentLeague = row.dataset.leagueGem === gem;
           row.classList.toggle('my-league', isCurrentLeague);
           row.querySelector('.league-status').textContent = isCurrentLeague ? 'твой вклад · 1 146' : 'вклад участников';
         });
-        standingsData.my.forEach(player => {
-          player.team = meta.name;
-          player.gem = gem;
-          if (player.current) player.name = currentNickname;
+        Object.values(standingsData).forEach(periodData => {
+          periodData.my.forEach(player => {
+            player.team = meta.name;
+            player.gem = gem;
+            if (player.current) player.name = currentNickname;
+          });
+          const currentAllPlayer = periodData.all.find(player => player.current);
+          currentAllPlayer.name = currentNickname;
+          currentAllPlayer.team = meta.name;
+          currentAllPlayer.gem = gem;
         });
-        const currentAllPlayer = standingsData.all.find(player => player.current);
-        currentAllPlayer.name = currentNickname;
-        currentAllPlayer.team = meta.name;
-        currentAllPlayer.gem = gem;
         finalGemUse.setAttribute('href', `#gem-${gem}-icon`);
         app.querySelector('#final-title').textContent = `Ты в лиге ${meta.genitive}`;
         app.querySelector('#final-description').textContent = meta.description;
-        renderStandings('my');
+        renderStandings();
       }
 
       function fitDesktopPreview() {
@@ -939,6 +1081,16 @@
 
       nicknameInput.addEventListener('input', () => {
         nicknameSubmit.disabled = nicknameInput.value.trim().length === 0;
+      });
+
+      generateNickname.addEventListener('click', () => {
+        const availableNicknames = generatedNicknames.filter(nickname => nickname !== lastGeneratedNickname);
+        const nickname = availableNicknames[Math.floor(Math.random() * availableNicknames.length)];
+        lastGeneratedNickname = nickname;
+        nicknameInput.value = nickname;
+        nicknameSubmit.disabled = false;
+        nicknameInput.focus();
+        nicknameInput.setSelectionRange(nickname.length, nickname.length);
       });
 
       nicknameForm.addEventListener('submit', event => {
@@ -997,6 +1149,18 @@
         tasksPanel.setAttribute('aria-hidden', 'true');
       });
 
+      app.querySelectorAll('[data-task-card] .task-card-trigger').forEach(button => button.addEventListener('click', () => {
+        const card = button.closest('[data-task-card]');
+        const willOpen = !card.classList.contains('open');
+        tasksPanel.querySelectorAll('[data-task-card]').forEach(otherCard => {
+          const otherButton = otherCard.querySelector('.task-card-trigger');
+          otherCard.classList.remove('open');
+          otherButton.setAttribute('aria-expanded', 'false');
+        });
+        card.classList.toggle('open', willOpen);
+        button.setAttribute('aria-expanded', String(willOpen));
+      }));
+
       app.querySelector('#open-standings').addEventListener('click', () => {
         tasksPanel.classList.remove('open');
         tasksPanel.setAttribute('aria-hidden', 'true');
@@ -1010,7 +1174,8 @@
         standingsPanel.setAttribute('aria-hidden', 'true');
       });
 
-      standingsButtons.forEach(button => button.addEventListener('click', () => renderStandings(button.dataset.standingsMode)));
+      standingsPeriodButtons.forEach(button => button.addEventListener('click', () => renderStandings(button.dataset.standingsPeriod, activeStandingsMode)));
+      standingsButtons.forEach(button => button.addEventListener('click', () => renderStandings(activeStandingsPeriod, button.dataset.standingsMode)));
 
       document.addEventListener('keydown', event => {
         if (event.key === 'Escape' && tasksPanel.classList.contains('open')) {
